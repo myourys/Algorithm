@@ -42,6 +42,7 @@ public:
     void InOrderTraverse();                         //非递归------中序遍历二叉树
     void PosOrderTraverse();                        //非递归------后序遍历二叉树
     void LevelOrderTraverse();                      //非递归------层次遍历二叉树
+    int LevelDepth();                               //通过层次遍历得到二叉树深度
 protected:
     TreeNode<T>* root;                       //树根
     T temp;                                  //代表元素为空的符号
@@ -207,5 +208,36 @@ void BiTree<T>::LevelOrderTraverse()
        if (p->rchild!= NULL) qu.EnQueue(p->rchild);
     }
 } 
+
+/*——– 求深度——层次遍历二叉树 ————–*/
+template <class T>
+int BiTree<T>::LevelDepth()
+{
+    Queue<TreeNode<T>*> que;
+    TreeNode<T> *p,*q;
+    que.EnQueue(root);
+    int deep = 1;
+    while(!que.IsEmpty())
+    {
+        que.DeQueue(p);
+        if(p->lchild) que.EnQueue(p->lchild);
+        if(p->rchild) que.EnQueue(p->rchild);
+    }
+    q = p;
+    //先求得最深的结点
+    while(q != root)
+    {
+        que.Clear();
+        que.EnQueue(root);
+        while(!que.IsEmpty())
+        {
+            que.DeQueue(p);
+            if(q == p->lchild || q == p->rchild){deep++;q = p;break;}
+            if(p->lchild) que.EnQueue(p->lchild);
+            if(p->rchild) que.EnQueue(p->rchild);
+        }
+    }
+    return deep;
+}
 #endif
 

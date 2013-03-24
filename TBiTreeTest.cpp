@@ -35,6 +35,8 @@ int main()
     
     cout<<endl;
     my.LevelOrderTraverse();
+    cout<<endl;
+    cout<<my.LevelDepth();
     return 0;
 }
 
