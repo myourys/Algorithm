@@ -56,6 +56,7 @@ void GetNext(const char *T,int next[])
 
      int LOLP = 0;     // Lenth of longest prefix,前后串
      next[1] = 0;
+     next[0] = 0;
      for( int NOCM=2; NOCM<iLen+1; NOCM++ )     // NOCM represent the number of characters matched
      {
          //如:abaaba+b ,b!=T[3]
@@ -77,7 +78,7 @@ void GetNext(const char *T,int next[])
 
 int KMPSearch(const char S[],const char T[])
 {
-    int SLen,TLen;
+    int SLen=0,TLen=0;
     while( '\0' != S[SLen] )
         SLen++;
     while( '\0' != T[TLen] )
@@ -85,24 +86,26 @@ int KMPSearch(const char S[],const char T[])
 
     int *next = new int[TLen];
     GetNext(T,next);
-    int NOCM = 0;     // Number of characters matched       
+    int NOCM = 0;     // Number of characters matched
 
-    cout<<next[8]<<endl;
-    for(int i=0;i<SLen-TLen+1;i++)
+    for(int i=0;i<SLen;i++)//必须比较到最后一位
     {
-        while(NOCM>0 && S[i]!=T[NOCM])
+        while(NOCM>0 && S[i]!=T[NOCM]) //如果前后串后字符不满足,则可以循环判断前后串的子前后串是否满足
             NOCM = next[NOCM];
 
         if(S[i]==T[NOCM])
-            if(++NOCM == TLen)
+            if((++NOCM) == TLen)
                 return i-TLen+1;
     }
     if(NOCM!=TLen) return -1;
 }
+
+
 int main()
 {
     cout<<StrSearch("abccabccabca","cabc")<<endl;
     cout<<KMPSearch("abccabccabca","cabc")<<endl;
+    cout<<KMPSearch("abccabccabca","cabccabc")<<endl;
 
 }
 
