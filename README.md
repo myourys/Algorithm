@@ -16,6 +16,15 @@ Algorithm
     ShellSord           希尔排序 O(N*(logN)2)
     RadixSord           基数排序O(nlog(r)m)
 
+###Huffman.cpp
+实现Huffman编码,采用系统STL库,实现对文件的编码和解码
+
+###TArray.h
+动态数组的实现
+
+###TBiTree.h
+二叉树的模版类实现
+包括前中后递归非递归遍历,层次遍历,层次遍历求深度
 
 ###TList.h
 TList.h 链表C++模版类实现   
@@ -32,3 +41,6 @@ CQueueTest.c 测试文件
 ###TStack.h
 TStack.h 栈模版类实现   
 TStackTest.cpp 测试文件
+
+###Trie.cpp
+前缀树的实现,测试前缀串查找
