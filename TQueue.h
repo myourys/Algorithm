@@ -13,7 +13,7 @@
 #define QUEUE_INIT_SIZE 100 //初始队列的最大长度
 #define QUEUEINCREMENT 10 //每次新增的长度
 
-template <class T> 
+template <class T>
 class Queue{
 public:
     Queue(); //构造函数，创建一个新的队列
@@ -21,7 +21,7 @@ public:
     bool EnQueue(T e); //插入一个值为e的队尾元素
     bool GetHead(T &e); //取出队头元素
     bool DeQueue(T &e); //删除队头元素
-    bool IsEmpty(); //判断是否非空
+    bool Empty(); //判断是否非空
     bool Clear(); //清空队列
 private:
     T *front;
@@ -29,7 +29,7 @@ private:
     int queuesize;
 };
 
-template<class T>  
+template<class T>
 Queue<T>::Queue()
 {
     if(!(front=(T*)malloc(QUEUE_INIT_SIZE*sizeof(T)))) exit(1);
@@ -38,7 +38,7 @@ Queue<T>::Queue()
 }
 
 /*———— 插入一个值为e的队尾元素 ————–*/
-template<class T>  
+template<class T>
 bool Queue<T>::EnQueue(T e)
 {
     if(rear-front>=queuesize){
@@ -51,7 +51,7 @@ bool Queue<T>::EnQueue(T e)
 }
 
 
-template<class T>  
+template<class T>
 bool Queue<T>::GetHead(T &e)
 {
     if(rear==front) return false;
@@ -59,7 +59,7 @@ bool Queue<T>::GetHead(T &e)
     return true;
 }
 
-template<class T>  
+template<class T>
 bool Queue<T>::DeQueue(T &e)
 {
     if(rear==front) return false;
@@ -75,24 +75,24 @@ bool Queue<T>::DeQueue(T &e)
     return true;
 }
 
-template<class T>  
-bool Queue<T>::IsEmpty()
+template<class T>
+bool Queue<T>::Empty()
 {
     return rear==front? 1:0;
 }
 
-template<class T>  
+template<class T>
 bool Queue<T>::Clear()
 {
     rear=front;
     return true;
 }
 
-template<class T>  
+template<class T>
 Queue<T>::~Queue()
 {
     free(front);
-} 
+}
 
-#endif 
+#endif
 

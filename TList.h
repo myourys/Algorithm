@@ -20,7 +20,7 @@ public:
     //~List(); 
     void Destroy(); //Destroy List
     void Clear(); 
-    bool IsEmpty(); 
+    bool Empty(); 
     int Length(); 
     T GetElem(int i,T &e); //Get Item by index
     int LocateElem(T e); //Get First Item
@@ -65,7 +65,7 @@ void List<T>::Clear()
 }
 
 template <class T> 
-bool List<T>::IsEmpty() 
+bool List<T>::Empty() 
 {
     return length ? true:false;
 }

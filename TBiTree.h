@@ -5,12 +5,12 @@
 #     HomePage: http://www.yiwuye.com
 #      Version: 1.0.1
 #   LastChange: 2013-03-23 00:36:24
-#         Desc: 
+#         Desc:
 #      History:
 =============================================================================*/
-#ifndef _BITREE_H 
-#define _BITREE_H 
-#include "TStack.h" 
+#ifndef _BITREE_H
+#define _BITREE_H
+#include "TStack.h"
 #include "TQueue.h"
 
 template <class T>
@@ -32,7 +32,7 @@ class BiTree{
 public:
     void CreateBiTree();                            //创建根节点------主过程
     void CreateBiTree(TreeNode<T>* &p);             //创建节点函数----子过程
-    void PreROrderTraverse();                       //递归------先序遍历二叉树---主过程              
+    void PreROrderTraverse();                       //递归------先序遍历二叉树---主过程
     void PreROrderTraverse(TreeNode<T>* p);         //递归------先序遍历二叉树---子过程
     void InROrderTraverse();                        //递归------中序遍历二叉树---主过程
     void InROrderTraverse(TreeNode<T>* p);          //递归------中序遍历二叉树---子过程
@@ -127,7 +127,7 @@ void BiTree<T>::PreOrderTraverse()
     Stack<TreeNode<T>*> S;
     TreeNode<T>* p;
     p=root;
-    while(p||!S.IsEmpty()){
+    while(p||!S.Empty()){
       if(p){S.Push(p);cout<<p->data<<" "; p=p->lchild;}
       else{
         S.Pop(p);
@@ -143,7 +143,7 @@ void BiTree<T>::InOrderTraverse()
     Stack<TreeNode<T>*> S;
     TreeNode<T>* p;
     p=root;
-    while(p||!S.IsEmpty()){
+    while(p||!S.Empty()){
       if(p){S.Push(p); p=p->lchild;}
       else{
         S.Pop(p);
@@ -162,7 +162,7 @@ void BiTree<T>::PosOrderTraverse()
     TreeNode<T>* p;
     TreeNode<T>* r;       //使用r节点表示访问了右子树替代标志域
     p=root;
-    while(p||!S.IsEmpty())
+    while(p||!S.Empty())
     {
       if(p){S.Push(p);p=p->lchild;}
       else{
@@ -186,7 +186,7 @@ void BiTree<T>::PosOrderTraverse()
 //   if(p){S.Push(p); p->tag=true;p=p->lchild;}
 //   else{
 //    S.GetTop(p);
-//    if(p->rchild&&!p->rchild->tag){  
+//    if(p->rchild&&!p->rchild->tag){
 //      p=p->rchild;S.Push(p);p->tag=true;p=p->lchild;
 //    }
 //    else{S.Pop(p);cout<<p->data<<" ";p=NULL;}
@@ -201,13 +201,13 @@ void BiTree<T>::LevelOrderTraverse()
     Queue<TreeNode<T>*> qu;
     TreeNode<T>* p;
     qu.EnQueue(root);
-    while(!qu.IsEmpty()){
+    while(!qu.Empty()){
        qu.DeQueue(p);
        cout<<p->data<<" ";
        if (p->lchild!= NULL) qu.EnQueue(p->lchild);
        if (p->rchild!= NULL) qu.EnQueue(p->rchild);
     }
-} 
+}
 
 /*——– 求深度——层次遍历二叉树 ————–*/
 template <class T>
@@ -217,7 +217,7 @@ int BiTree<T>::LevelDepth()
     TreeNode<T> *p,*q;
     que.EnQueue(root);
     int deep = 1;
-    while(!que.IsEmpty())
+    while(!que.Empty())
     {
         que.DeQueue(p);
         if(p->lchild) que.EnQueue(p->lchild);
@@ -229,7 +229,7 @@ int BiTree<T>::LevelDepth()
     {
         que.Clear();
         que.EnQueue(root);
-        while(!que.IsEmpty())
+        while(!que.Empty())
         {
             que.DeQueue(p);
             if(q == p->lchild || q == p->rchild){deep++;q = p;break;}

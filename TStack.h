@@ -19,7 +19,7 @@ public:
     void Push(DataType e);     
     int Pop(DataType &e);      
     int GetTop(DataType &e);   
-    int IsEmpty();          
+    int Empty();          
     void Destroy();       
 private:
     DataType *base;
@@ -62,7 +62,7 @@ int Stack<DataType>::GetTop(DataType &e)
     return 1;
 }
 template <class DataType>
-int Stack<DataType>::IsEmpty()
+int Stack<DataType>::Empty()
 {
     return top==base? 1:0;
 }

@@ -1,9 +1,19 @@
+/*=============================================================================
+#     FileName: BSTree.cpp
+#         Desc: 二叉查找树
+#       Author: Hector
+#        Email: myourys@gmail.com
+#     HomePage: http://www.yiwuye.com
+#      Version: 0.0.1
+#   LastChange: 2013-04-01 23:51:03
+#      History:
+=============================================================================*/
 #include<iostream>
-using namespace std; 
+using namespace std;
 #include <stdlib.h>
 
 /*
- * 二叉查找树
+ * 二叉查找树,左子树总是小时根节点,右子树总是大于根节点
  */
 
 /*
@@ -97,16 +107,16 @@ bool DeleteBST(BiTree<T>* &root,T key)
 	return true;
 }
 
-template <class T>  
-void DestroyBST( BiTree<T>* &root )  
-{  
-    if ( root != NULL )  
-    {  
-        DestroyBST( root->lchild );  
-        DestroyBST( root->rchild );  
-        delete root;  
-    }    
-}  
+template <class T>
+void DestroyBST( BiTree<T>* &root )
+{
+    if ( root != NULL )
+    {
+        DestroyBST( root->lchild );
+        DestroyBST( root->rchild );
+        delete root;
+    }
+}
 
 template <class T>
 void InROrderBST(BiTree<T>* root)
