@@ -62,33 +62,88 @@ bool InsertBST(BiTree<T>* &root,T key)
 }
 
 template <class T>
+bool DeleteBST(BiTree<T>* &root,T key)
+{
+	if(!root)
+		return false;
+
+	if(key < root->key)
+		return DeleteBST(root->lchild,key);
+	else if (key >root->key)
+		return DeleteBST(root->rchild,key);
+	else
+	{
+		BiTree<T>* my=root;
+		if(!root->lchild) //左子树为空，只需右接右子树
+			root=root->rchild;
+		else if (!root->rchild)
+			root=root->lchild;
+		else
+		{
+			BiTree<T>* p=root->lchild;
+			BiTree<T>* fa=root;
+			while(p->rchild) //找到左子树最大值 放到删除的节点中当做新的节点
+			{
+				fa=p;
+				p=p->rchild;
+			}
+			fa->rchild = p->lchild;
+			root = p;
+			root->lchild = my->lchild;
+			root->rchild = my->rchild;
+		}
+		delete my;
+	}
+	return true;
+}
+
+template <class T>  
+void DestroyBST( BiTree<T>* &root )  
+{  
+    if ( root != NULL )  
+    {  
+        DestroyBST( root->lchild );  
+        DestroyBST( root->rchild );  
+        delete root;  
+    }    
+}  
+
+template <class T>
 void InROrderBST(BiTree<T>* root)
 {
     if(root)
     {
         InROrderBST(root->lchild);
-        cout<<root->key<<endl;
+        cout<<root->key<<"  ";
         InROrderBST(root->rchild);
     }
 }
 
 
+
 int main()
 {
     BiTree<int>* root=NULL;
-    int i,t;
+    int i;
+	int t[]={5,9,1,0,4,8,7,3,2,6};
     for(i=0;i<10;i++)
-	{
-		t = 1+rand()%1000;
-		cout<<t<<endl;
-        InsertBST(root,t);
-	}
+        InsertBST(root,t[i]);
 
-	cout<<"\nInROrderBST:"<<endl;
+	cout<<"InROrderBST:"<<endl;
     InROrderBST(root);
 
+	DeleteBST(root,0);
+	cout<<"\nDelete [0] InROrderBST:"<<endl;
+    InROrderBST(root);
+
+	DeleteBST(root,5);
+	cout<<"\nDelete [5] InROrderBST:"<<endl;
+    InROrderBST(root);
+
+	DeleteBST(root,7);
+	cout<<"\nDelete [7] InROrderBST:"<<endl;
+    InROrderBST(root);
+
+	DestroyBST(root);
     return 0;
 }
-
-
-
