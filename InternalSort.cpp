@@ -13,9 +13,6 @@
 #include <stdlib.h>
 using namespace std;
 
-int s[10]={8,1,3,0,9,7,2,4,6,5};
-int n = 10;
-
 void swap(int &a,int &b)
 {
     int t = a;
@@ -28,12 +25,12 @@ void swap(int &a,int &b)
  * O(n^2) =  (n-1)*n/2
  * 
  */
-void BubbingSord()
+void BubbingSort(int s[],int n)
 {
-    int i,j,t,pos;
+    int i,j;
     for(i=0;i<n-1;i++)
         for(j=i+1;j<n;j++)
-            if(s[j]>s[i])
+            if(s[j]<s[i])
                 swap(s[i],s[j]);
 }
 
@@ -43,7 +40,7 @@ void BubbingSord()
  * 对冒泡的一种改进，减少交换次数，如果内循环元素比外循环元素大，则记下位置和大小，内循环完成后得到最大的数
  * 每次外循环将最大(小)的数放在前面
  */
-void SimpleSelectSord()
+void SimpleSelectSort(int s[],int n)
 {
     int i,j,t,pos;
     for(i=0;i<n-1;i++)
@@ -52,7 +49,7 @@ void SimpleSelectSord()
         pos = i;
         for(j=i+1;j<n;j++)
         {
-            if(s[j]>t)
+            if(s[j]<t)
             {
                 pos = j;
                 t = s[j];
@@ -69,7 +66,7 @@ void SimpleSelectSord()
  * 以开头第一个元素为中间点,大的放在前面,小的放在后边,递归排序
  * 分别从后往前搜索,将大数放前面,然后从前往后搜索,将小的放在后边
  */
-void FastSord(int begin,int end)
+void FastSort(int s[],int begin,int end)
 {
     if(begin>=end) return; //重合点
     // a,b 为前后搜索的定位点,e为中间点
@@ -79,14 +76,14 @@ void FastSord(int begin,int end)
     //从后往前搜索
     for(b=end;b>a;b--)
     {
-        if(s[b]>s[e])
+        if(s[b]<s[e])
         {
             swap(s[e],s[b]);
             e=b;
             //从前往后搜索
             for(a = a+1;a<b;a++)
             {
-                if(s[a]<s[e])
+                if(s[a]>s[e])
                 {
                     swap(s[e],s[a]);
                     e=a;
@@ -95,8 +92,8 @@ void FastSord(int begin,int end)
             }
         }
     }
-    FastSord(begin,e-1);
-    FastSord(e+1,end);
+    FastSort(s,begin,e-1);
+    FastSort(s,e+1,end);
 }
 
 /*
@@ -111,11 +108,11 @@ void FastSord(int begin,int end)
  *⒍ 重复步骤2
  */
 
-void InsertSort()
+void InsertSort(int s[],int n)
 {
     int i,j;
     for(i=0;i<n-1;i++) //i前面都是排好序的数列
-       for(j=i+1;j>0 && s[j] > s[j-1];j--) // 大数往前面冒泡
+       for(j=i+1;j>0 && s[j] < s[j-1];j--) // 大数往前面冒泡
            swap(s[j],s[j-1]);
 
 }
@@ -124,11 +121,11 @@ void InsertSort()
  * O(n^2)
  * 只能减少插入排序的比较次数，移动次数不变
  */
-void BInsertSort()
+void BInsertSort(int s[],int n)
 {
     int i,j,begin,end,mid,t;
     for(i=0;i<n-1;i++) //i前面都是排好序的数列
-        if(s[i+1]>s[i])
+        if(s[i+1]<s[i])
         {
             begin = 0; 
             end = i;
@@ -136,7 +133,7 @@ void BInsertSort()
             while(begin<=end)
             {
                 mid = (begin+end)/2;
-                if(s[i+1]>s[mid])
+                if(s[i+1]<s[mid])
                     end = mid-1;
                 else
                     begin = mid+1;
@@ -159,13 +156,13 @@ void BInsertSort()
  * 然后分为5/2=2组,每组排列...
  * 直至分为1组就是有序了
  */
-void ShellSord()
+void ShellSort(int s[],int n)
 {
     int i,j;
     for(int gap =n/2;gap>0;gap /=2) //每次折半
         for(i=gap;i<n;i++) //从第二行数据开始,直接插入排序
         {
-            for(j=i-gap;j>=0 && s[j+gap]>s[j];j-=gap) //与之前一列数据比较,此处参考插入排序
+            for(j=i-gap;j>=0 && s[j+gap]<s[j];j-=gap) //与之前一列数据比较,此处参考插入排序
                 swap(s[j],s[j+gap]);
         }
 }
@@ -177,13 +174,13 @@ void ShellSord()
  * 即:先按个位排序,然后按十位排序...
  */
 
-void RadixSord(int *m)
+void RadixSort(int m[],int n)
 {
     int w = 6,j,k,r=1; //最大6位数
     for(int i = 1;i<=w;i++)
     {
         for(j=1;j<n;j++) //插入排序
-            for(k=j-1;k>=0 && m[k+1]/r % 10 > m[k]/r %10;k--)
+            for(k=j-1;k>=0 && m[k+1]/r % 10 < m[k]/r %10;k--)
                 swap(m[k],m[k+1]);
 
         r*=10;
@@ -224,32 +221,100 @@ void Merge(int a[], int b[], int low, int mid, int high)  //将A序列的两组(
     }
 }
 
-void PassMergePass(int a[], int b[], int seg, int size)
-{
 
+//合并序列
+void SubMerge(int a[], int b[], int ibegin, int mid,int iend)
+{
+   int pos = ibegin,i,j;
+   for(i=ibegin,j=mid;i<=mid-1&&j<=iend;)
+   {
+       if(a[i]>a[j])
+           b[pos++] = a[j++];
+       else
+           b[pos++] = a[i++];
+   }
+   while(i<=mid-1)
+       b[pos++] = a[i++];
+   while(j<=iend)
+       b[pos++] = a[j++];
+
+   //同时保持a也有序
+   for(i=ibegin;i<=iend;i++)
+       a[i]=b[i];
 }
-void MergeSord()
-{
-    int *temp=new int[n];
 
+/*
+ * 将a中的从seg开始，长度为size的数排好序
+ */
+
+void SubMergeSort(int a[], int b[], int seg, int size)
+{
+    if(size>=2)
+    {
+        SubMergeSort(a,b,seg,size/2);//前一半合并到b中
+        SubMergeSort(a,b,seg+size/2,size-size/2);//后一半合并到b中
+		SubMerge(b,a,seg,seg+size/2,seg +size-1); //保持a,b都有序
+    }
+}
+
+void MergeSort(int a[],int size)
+{
+	int *t=a;
+    int *temp=new int[size];
+	for(int i=0;i<size;i++)
+		temp[i]=a[i];
+	SubMergeSort(a,temp,0,size);
+    delete []temp;
 }
 
 
 int main()
 {
-    //BubbingSord();
-   // FastSord(0,n-1);
-    //BInsertSort();
-    ShellSord();
-    for(int i =0;i<n;i++)
-        cout<<s[i];
+	int Flag = 0;
+	while(1)
+	{
+		Flag++;
+		if(Flag >7)
+			break;
+		int n = 10;
+		int s[10]={8,1,3,0,9,7,2,4,6,5};
+		switch(Flag)
+		{
+		case 1:
+			cout<<"冒泡排序【BubbingSort】："<<endl;
+			BubbingSort(s,n);break;
+		case 2:
+			cout<<"\n简单选择排序【SimpleSelectSort】："<<endl;
+			SimpleSelectSort(s,n);break;
+		case 3:
+			cout<<"\n快速排序【FastSort】："<<endl;
+			FastSort(s,0,n-1);break;
+		case 4:
+			cout<<"\n插入排序【InsertSort】："<<endl;
+			InsertSort(s,n);break;
+		case 5:
+			cout<<"\n折半插入排序【BInsertSort】："<<endl;
+			BInsertSort(s,n);break;
+		case 6:
+			cout<<"\n希尔排序【ShellSort】："<<endl;
+			ShellSort(s,n);break;
+		case 7:
+			cout<<"\n归并排序【MergeSort】："<<endl;
+			MergeSort(s,n);break;
+		}
+		
+		for(int i =0;i<n;i++)
+			cout<<s[i]<<"  ";
+	}
 
-    cout<<endl;
+    int m[10] ={10223,22,55,922,531,7,0,999999,888,347443};
+	cout<<"\n基数排序【RadixSort】："<<endl;
+    RadixSort(m,10);
+    for(int i =0;i<10;i++)
+        cout<<m[i]<<"  ";
 
-    int m[] ={10223,22,55,922,531,7,0,999999,888,347443};
-    RadixSord(m);
-    for(int i =0;i<n;i++)
-        cout<<m[i]<<' ';
+	cout<<endl;
     return 0;
 }
+
 
