@@ -11,7 +11,7 @@
 
 #include<iostream>
 #include <stdlib.h>
-#include <ctime> 
+#include <ctime>
 using namespace std;
 
 void swap(int &a,int &b)
@@ -24,7 +24,7 @@ void swap(int &a,int &b)
 /*
  * 冒泡排序
  * O(n^2) =  (n-1)*n/2
- * 
+ *
  */
 void BubbingSort(int s[],int n)
 {
@@ -128,7 +128,7 @@ void BInsertSort(int s[],int n)
     for(i=0;i<n-1;i++) //i前面都是排好序的数列
         if(s[i+1]<s[i])
         {
-            begin = 0; 
+            begin = 0;
             end = i;
             // 找到最接近的右侧点
             while(begin<=end)
@@ -316,63 +316,101 @@ void MinHeapFixdown(int a[],int i,int n) //大数下沉，自下而上
 
 /*
  * 桶排序
+ * 类似Hash,采用分治的思想
+ * O(N)-O(N^2)
  */
+
+struct Bucket //桶结构
+{
+    int* s;
+    int size;
+    Bucket()
+    {
+        s =NULL;
+        size = 0;
+    }
+};
+
 void BucketSort(int a[],int n)
 {
-	int b[1000][n] = new int; //1千个桶
+	Bucket b[1000]; //1千个桶
+    for(int i=0;i<1000;i++)
+        b[i].s = new int[n];
+    //假如数在[0~1,000,000) 之间,分桶
+    int t;
+    for(int i = 0;i<n;i++)
+    {
+        t = a[i]/1000;
+        b[t].s[b[t].size++] = a[i];
+    }
+    int pos =0;
+    for(int i=0;i<1000;i++)
+    {
+        if(b[i].size >0)
+        {
+            QuickSort(b[i].s,0,b[i].size-1); //桶中数字排序
+            for(int j=0;j<b[i].size;j++)
+                a[pos++] = b[i].s[j];
+        }
+        delete []b[i].s;
+    }
 }
 
 int main()
 {
 	int Flag = 0;
-	while(Flag <= 9)
+	while(Flag < 10)
 	{
 		Flag++;
-		int n = 10000;
+		int n = 1000000;
 		int* s =new int[n];
 		for(int i=0;i<n;i++)
-			s[i] = rand() * rand()+1; //注rand()产生的数在0到65536之间
+			s[i] = rand() %1000000; //注rand()产生的数在0到RAND_MAX之间
 		srand(time(NULL));
-		clock_t ibegin, iend; 
-		ibegin = clock();  
+		clock_t ibegin, iend;
+		ibegin = clock();
 		switch(Flag)
 		{
-		case 1:
+		case 19:
 			cout<<"冒泡排序【BubbingSort】："<<endl;
 			BubbingSort(s,n);break;
-		case 2:
-			cout<<"\n简单选择排序【SimpleSelectSort】："<<endl;
+		case 29:
+			cout<<"简单选择排序【SimpleSelectSort】："<<endl;
 			SimpleSelectSort(s,n);break;
 		case 3:
-			cout<<"\n快速排序【QuickSort】："<<endl;
+			cout<<"快速排序【QuickSort】："<<endl;
 			QuickSort(s,0,n-1);break;
-		case 4:
-			cout<<"\n插入排序【InsertSort】："<<endl;
+		case 49:
+			cout<<"插入排序【InsertSort】："<<endl;
 			InsertSort(s,n);break;
-		case 5:
-			cout<<"\n折半插入排序【BInsertSort】："<<endl;
+		case 59:
+			cout<<"折半插入排序【BInsertSort】："<<endl;
 			BInsertSort(s,n);break;
 		case 6:
-			cout<<"\n希尔排序【ShellSort】："<<endl;
+			cout<<"希尔排序【ShellSort】："<<endl;
 			ShellSort(s,n);break;
 		case 7:
-			cout<<"\n归并排序【MergeSort】："<<endl;
+			cout<<"归并排序【MergeSort】："<<endl;
 			MergeSort(s,n);break;
 		case 8:
-			cout<<"\n堆排序【MiniHeap】："<<endl;
+			cout<<"堆排序【MiniHeap】："<<endl;
 			HeapSort(s,n);break;
-		case 9:
-			cout<<"\n基数排序【RadixSort】："<<endl;
+		case 99:
+			cout<<"基数排序【RadixSort】："<<endl;
 			RadixSort(s,n);break;
+		case 10:
+			cout<<"桶排序【BucketSort】："<<endl;
+	            BucketSort(s,n);break;
 		}
 		iend = clock();
 		if(iend - ibegin>0.1)
 			cout<<"时间（毫秒）："<<iend - ibegin<<endl;
-		/*for(int i =0;i<n;i++)
-			cout<<s[i]<<"  ";*/
+		//for(int i =0;i<n;i++)
+		//	cout<<s[i]<<"  ";
+        delete []s;
+	    cout<<endl;
 	}
 
-	cout<<endl;
     return 0;
 }
 

@@ -10,11 +10,14 @@ Algorithm
 
     BubbingSort         冒泡排序 O(n^2)
     SimpleSelectSort    简单选择排序 O(n^2)
-    FastSort            快速排序O(n*logn)
+    **QuickSort            快速排序O(n*logn)**
     InsertSort          插入排序O(n^2)
     BInsertSort         折半插入排序O(n^2)
-    ShellSord           希尔排序 O(N*(logN)2)
-    RadixSord           基数排序O(nlog(r)m)
+    **ShellSort           希尔排序 O(N*(logN))**
+    RadixSort           基数排序O(nlog(r)m)
+    **MergeSort           归并排序O(n*log(n))**
+    **HeapSort            堆排序O(n*log(n)**
+    BucketSort          桶排序O(N)~O(n^2)
 
 ###Huffman.cpp
 实现Huffman编码,采用系统STL库,实现对文件的编码和解码
