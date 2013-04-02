@@ -5,7 +5,7 @@
 #        Email: myourys@gmail.com
 #     HomePage: http://www.yiwuye.com
 #      Version: 0.0.1
-#   LastChange: 2013-04-01 23:52:42
+#   LastChange: 2013-04-03 00:09:10
 #      History:
 =============================================================================*/
 #include<iostream>
@@ -15,6 +15,7 @@ using namespace std;
 /*
  * 参考维基百科 http://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91
  * 红黑树是二叉搜索树的变种，故先了解二叉排序树BSTree.cpp
+ * 可做类Map存储结构
  */
 
 enum Nodecolor{Red,Black};
@@ -40,6 +41,7 @@ protected:
     RBNode<T>* root;
     void AdjustInsertNode(RBNode<T>* n); //调整插入节点颜色等
     void AdjustDelNode(RBNode<T>* n);    //调整待移走的节点
+    void AdjustDelNodeSub(RBNode<T>* n);    //调整待移走的节点
 public:
 	RBTree():root(NULL){};
     ~RBTree();
@@ -92,7 +94,7 @@ template <class T>
 RBNode<T>* RBTree<T>::Sibling(RBNode<T>* n)		//兄弟
 {
 	if(n->parent)
-		if(n = n->parent->lchild)
+		if(n == n->parent->lchild)
 			return n->parent->rchild;
 		else
 			return n->parent->lchild;
@@ -280,34 +282,41 @@ bool RBTree<T>::Delete(RBNode<T>* n,T key) //删除
 		while(n->rchild) //找到左子树最大值 放到删除的节点中当做新的节点
 			n=n->rchild;
         p = n->lchild; //被移走的节点由其左孩子代替
-		//p->parent->rchild = p->lchild;
-		//n = p;
-		//n->lchild = my->lchild;
-		//n->rchild = my->rchild;
 	}
+    //AdjustDelNode(n);//删除前调整
 
-    //待移走的节点如果是红色,则不影响
-    if(n->color == Black)
-    {
-        if(p && p->color == Red) //如果孩子是红色,则改为黑色,顶替上来
-            p->color = Black;
-        else if(n==root) //待移走的是根节点,孩子自动替换上来当做新的根节点就可以了
-            ;
+    if(my==root) //如果根节点被移走,新上来的节点当做根节点
+        if(my->lchild && my->rchild)
+            root=n;
         else
-        {
-            RBNode<T>* s= Sibling(n);
-            if(s && s->color==Red) //对应维基百科case2,如果兄弟为黑色,旋转一下
-            {
-                n->parent = Red;
-                s->color = Black;
-                if(n==n->parent->lchild)
-                    RotateLeft(n->parent);
-                else
-                    RotateRight(n->parent);
-            }
-        }
-    }
+            root = p;
 
+    //正式移走
+    //先将n替换掉
+    if(p)
+    {
+        p->color = n->color;
+        p->parent = n->parent;
+    }
+    if(n->parent)
+        if(n==n->parent->lchild)
+            n->parent->lchild=p;
+        else
+            n->parent->rchild=p;
+
+    //如果删除的不是n
+    if(my!=n)
+    {
+        n->parent = my->parent;
+        n->color = my->color;
+        n->lchild = my->lchild;
+        n->rchild = my->rchild;
+        if(my->parent)
+            if(my==my->parent->lchild)
+                my->parent->lchild=n;
+            else
+                my->parent->rchild=n;
+    }
 	delete my;
 	return true;
 }
@@ -315,62 +324,74 @@ bool RBTree<T>::Delete(RBNode<T>* n,T key) //删除
 template <class T>
 void RBTree<T>::AdjustDelNode(RBNode<T>* n)    //调整待移走的节点
 {
-    //待移走的节点如果是红色,则不影响
+     //待移走的节点如果是红色,则不影响
     if(n->color == Red)
         return;
 
     RBNode<T>* p = n->lchild ? n->lchild:n->rchild; //替换的节点
-    if(p && p->color == Red) //如果孩子是红色,则改为黑色,顶替上来    case 1
+    if(p && p->color == Red) //如果孩子是红色,则改为黑色,顶替上来
         p->color = Black;
-    else if(n==root) //待移走的是根节点,孩子自动替换上来当做新的根节点就可以了
-        ;
     else
-    {
-        RBNode<T>* s= Sibling(n);
-        if(s && s->color==Red) //对应维基百科case2,如果兄弟为红色,旋转一下后再调整 case 2
-        {
-            n->parent = Red;
-            s->color = Black;
-            if(n==n->parent->lchild)
-                RotateLeft(n->parent);
-            else
-                RotateRight(n->parent);
+        AdjustDelNodeSub(n);
+}
 
-            AdjustDelNode(n);
-        }
-        //如果兄弟为黑色,父为黑色,则将改兄弟改为红色,本身[黑色]移走要-1,相当于调整父节点一样 case 3
-        else if(n->parent->color==Black&&s&&s->color == Black&&(!s->lchild || s->color==Black)&&(!s->rchild || s->rchild->color==Black))
+template <class T>
+void RBTree<T>::AdjustDelNodeSub(RBNode<T>* n)    //调整待移走的节点
+{
+    if(n==root) //case1 待移走的是根节点,孩子自动替换上来当做新的根节点就可以了
+        return;
+
+    RBNode<T>* s= Sibling(n);
+    //case2 兄弟为红色,作旋转变为黑色,此时父为红,侄子为黑,转化为case4
+    if(s && s->color==Red) //对应维基百科case2,如果兄弟为红色,旋转一下后让其变成黑色再调整 case 2
+    {
+        n->parent->color = Red;
+        s->color = Black;
+        if(n==n->parent->lchild)
+            RotateLeft(n->parent);
+        else
+            RotateRight(n->parent);
+
+        AdjustDelNodeSub(n);
+    }
+    else //兄弟为黑色
+    {
+        //侄子全为黑色
+        if(s&&(!s->lchild || s->lchild->color==Black)&&(!s->rchild || s->rchild->color==Black))
         {
-            s->color =Red;
-            AdjustDelNode(n->parent);
-        }
-        //如果父为红,兄弟为黑色,将父改为黑,兄改为红,则自己+1,抵消自己的-1 case 4
-        else if(n->parent==Red&&s&&s->Black&&(!s->lchild || s->color==Black)&&(!s->rchild || s->rchild->color==Black))
-        {
-            s->color=Red;
-            n->parent->color = Black;
-        }
-        //如果兄弟节点有一个为红色 转化为 case 2- 4 case 5
-        else if(s&&s->color==Black)
-        {
-            if(n==n->parent->lchild && (!s->rchild||s->rchild->color==Black)&&s->lchild && s->lchild==Red)
+            //case3 父为黑色 则将改兄弟改为红色,本身[黑色]移走要-1,相当于调整父节点一样,递归 case 3
+            if(n->parent->color==Black)
             {
-                s->color = Red;
-                s->lchild->color =Black;
-                RotateRight(s); //右旋
+                s->color =Red;
+                AdjustDelNodeSub(n->parent);
             }
-            else if(n==n->parent->rchild && (!s->lchild||s->lchild->color==Black)&&s->rchild && s->rchild==Red)
+            //case4 如果父为红,将父改为黑,兄改为红,则自己+1,抵消自己的-1 case 4,完成
+            else if(n->parent->color==Red)
             {
-                s->color = Red;
-                s->rchild->color =Black;
-                RotateLeft(s); //左旋
+                s->color=Red;
+                n->parent->color = Black;
             }
-            AdjustDelNode(n);
         }
+        //case 5 左侄子为红,右侄子为黑 做旋转转为右侄子为红,转为case 6
+        else if(s&&n==n->parent->lchild && (!s->rchild||s->rchild->color==Black)&&s->lchild && s->lchild->color==Red)
+        {
+            s->color = Red;
+            s->lchild->color =Black;
+            RotateRight(s); //右旋
+            AdjustDelNodeSub(n);
+        }
+        else if(s&&n==n->parent->rchild && (!s->lchild||s->lchild->color==Black)&&s->rchild && s->rchild->color==Red)
+        {
+            s->color = Red;
+            s->rchild->color =Black;
+            RotateLeft(s); //左旋
+            AdjustDelNodeSub(n);
+        }
+        //case 6 右侄子红,父有可能红或黑,做选择即可
         else
         {
-            s->color = n->parent->color;
-            n->parent->color = Black;
+            s->color = n->parent->color; //s代替父的位置
+            n->parent->color = Black; //如果原来为红,s为红,父需转化为黑,如果为黑,无需转化,保证n+1
             if(n==n->parent->lchild)
             {
                 s->rchild->color = Black;
@@ -383,37 +404,33 @@ void RBTree<T>::AdjustDelNode(RBNode<T>* n)    //调整待移走的节点
             }
         }
     }
-
-    if(n==root) //如果跟节点被移走,新上来的节点当做跟节点
-        root = p;
-
 }
 
 template <class T>
 void RBTree<T>::AdjustInsertNode(RBNode<T>* n) //调整插入节点颜色等
 {
-    if(!n->parent) //根节点颜色为红色
+    if(!n->parent) //根节点颜色为红色 case 1
         n->color = Black;
-    else if (n->parent->color == Black) //父节点颜色为黑色，无需调整
+    else if (n->parent->color == Black) //父节点颜色为黑色，无需调整 case 2
         ;
-    else if (Uncle(n) &&Uncle(n)->color == Red)   //父节点为红色，此时本身也会红色，不满足条件
+    else if (Uncle(n) &&Uncle(n)->color == Red)   //父节点为红色，此时本身也会红色，不满足条件 case 3
     {
         n->parent->color = Black;
         Uncle(n)->color = Black;
         GrandParent(n)->color = Red;
         AdjustInsertNode(GrandParent(n)); //递归检查祖父节点
     }
-    else if (n==n->parent->rchild && n->parent == GrandParent(n)->lchild)
+    else if (n==n->parent->rchild && n->parent == GrandParent(n)->lchild) // case 4 转为 case5
     {
         RotateLeft(n->parent);
         AdjustInsertNode(n);
     }
-    else if (n==n->parent->lchild && n->parent == GrandParent(n)->rchild)
+    else if (n==n->parent->lchild && n->parent == GrandParent(n)->rchild) // case 4 转为 case 5
     {
         RotateRight(n->parent);
         AdjustInsertNode(n);
     }
-    else  //无叔节点或为黑色,通过变换,将红色节点移到叔节点位置,对应维基百科中的情况5
+    else  //无叔节点或为黑色,通过变换,将红色节点移到叔节点位置,对应维基百科中的情况5 case 5
     {
         n->parent->color = Black;
         GrandParent(n)->color = Red;
@@ -438,6 +455,9 @@ int main()
     cout<<"\nOutLevelROrder:"<<endl;
     tree.OutLevelROrder();
 
+    cout<<"\nOutLevelROrder:"<<endl;
+    tree.Delete(3);
+    tree.OutLevelROrder();
 
     return 0;
 }
