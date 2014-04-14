@@ -9,7 +9,7 @@
 #      History:
 =============================================================================*/
 
-#include<iostream>
+#include <iostream>
 #include <stdlib.h>
 #include <ctime>
 using namespace std;
@@ -23,6 +23,7 @@ void swap(int &a,int &b)
 
 /*
  * 冒泡排序
+ * 从第一个数开始,循环和旁边的数比较,如果后边小,则交换,因此轮交换过后最小数到最前面
  * O(n^2) =  (n-1)*n/2
  *
  */
@@ -64,7 +65,7 @@ void SimpleSelectSort(int s[],int n)
 /*
  * 快速排序
  * O(n*logn)
- * 以开头第一个元素为中间点,大的放在前面,小的放在后边,递归排序
+ * 以开头第一个元素为中间点,小的放在前面,大的放在后边,递归排序
  * 分别从后往前搜索,将大数放前面,然后从前往后搜索,将小的放在后边
  */
 void QuickSort(int s[],int begin,int end)
@@ -99,7 +100,7 @@ void QuickSort(int s[],int begin,int end)
 
 /*
  * 插入排序
- * O(n^2) 
+ * O(n^2)
  * 算法适用于少量数据的排序
  *⒈ 从第一个元素开始，该元素可以认为已经被排序
  *⒉ 取出下一个元素，在已经排序的元素序列中从后向前扫描

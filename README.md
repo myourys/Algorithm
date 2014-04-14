@@ -10,7 +10,7 @@ Algorithm
 
     BubbingSort         冒泡排序 O(n^2)
     SimpleSelectSort    简单选择排序 O(n^2)
-    QuickSort            快速排序O(n*logn)
+    QuickSort           快速排序O(n*logn)
     InsertSort          插入排序O(n^2)
     BInsertSort         折半插入排序O(n^2)
     ShellSort           希尔排序 O(N*(logN))
