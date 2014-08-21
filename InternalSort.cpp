@@ -360,6 +360,8 @@ void BucketSort(int a[],int n)
 int main()
 {
 	int Flag = 0;
+
+    srand(time(NULL));
 	while(Flag < 10)
 	{
 		Flag++;
@@ -367,9 +369,10 @@ int main()
 		int* s =new int[n];
 		for(int i=0;i<n;i++)
 			s[i] = rand() %1000000; //注rand()产生的数在0到RAND_MAX之间
-		srand(time(NULL));
 		clock_t ibegin, iend;
 		ibegin = clock();
+
+        bool isSort = true;
 		switch(Flag)
 		{
 		case 19:
@@ -402,14 +405,17 @@ int main()
 		case 10:
 			cout<<"桶排序【BucketSort】："<<endl;
 	            BucketSort(s,n);break;
+        default:
+            isSort = false;
 		}
 		iend = clock();
-		if(iend - ibegin>0.1)
-			cout<<"时间（毫秒）："<<iend - ibegin<<endl;
+		if(iend - ibegin>0.1 && isSort)
+			cout<<"时间（毫秒）："<<iend - ibegin<<endl<<endl;
+
 		//for(int i =0;i<n;i++)
 		//	cout<<s[i]<<"  ";
+
         delete []s;
-	    cout<<endl;
 	}
 
     return 0;
