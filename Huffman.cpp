@@ -11,7 +11,7 @@
 /*
  * 霍夫曼编码（Huffman Coding）是一种编码方式，是一种用于无损数据压缩的熵编码（权编码）算法。
  * 方式是先通过优先队列建立Huffman树,求得Huffman编码,然后用此码编码和解码
- * 参考:http://coolshell.cn/articles/7459.html
+ * 参考: <http://coolshell.cn/articles/7459.html>
  */
 #include <iostream>
 #include <map>

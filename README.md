@@ -53,3 +53,6 @@ TStackTest.cpp 测试文件
 
 ###RBTree.cpp
 红黑树的C++模版类实现
+
+###AStar.cpp
+A*算法的简单实现
