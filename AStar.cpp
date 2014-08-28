@@ -22,10 +22,21 @@
  * f'(n)是估价函数，g'(n)是起点到终点的最短路径值，h'(n)是n到目标的最短路经的启发值。
  */
 
+/*
+ * 跳步优化
+ * 跳步优化不同于常规的A*算法寻找当前节点所有的子节点，而是在于“跳过”一些明显不必经过的路，
+ * 抽象地说，就是在搜索时大量减掉明显无用的分支，使得朴素的搜索过程变得高效。
+ * 参考：
+ * 1. 代码：https://github.com/qiao/PathFinding.js/blob/master/src/finders/JumpPointFinder.js
+ * 2. 解说：http://plusplus7.com/lemonbag/jpsstudy
+ */
+
 #include <iostream>
 #include <queue> /* priority_queue不支持遍历，利用vector容器和push_heap(堆算法)模拟一个优先容器 */
 #include <vector>
 #include <sstream>
+
+#define kUseJumpNode 0
 
 #define STR(A) #A
 
@@ -34,13 +45,13 @@ using namespace std;
 /* 地图
  * 第一行 行列数
  * 第二行 起点，终端坐标
- * 地图 0:可通过 1:不可通过
+ * 地图 0:可通过 1:不可通过 坐标起点为左下角
  * 这里我们设定一个节点到相邻节点消耗为10，如果是对接线则为14.
  */
 
 const char* MapStr = STR(
 9 10                \n
-2 3    2 6          \n
+6 3    6 6          \n
 0 0 0 0 1 0 0 0 0 0 \n
 0 0 0 0 1 0 0 0 0 0 \n
 0 0 0 0 1 0 0 0 0 0 \n
@@ -56,6 +67,9 @@ class Point
 {
 public:
     int x,y;
+
+    Point(int _x,int _y):x(_x),y(_y){};
+    Point(){x =-1;y=-1;};
     Point& operator=(const Point & other){this->x = other.x;this->y=other.y;return *this;};
     bool operator==(const Point & other){return this->x == other.x && this->y== other.y;};
 };
@@ -91,6 +105,10 @@ public:
 private:
     int estimate(const Point& pos); //估计点到目的地的值
     void initNode(Node &node,const Point& pos,int g,Node* father);
+    void expandNode(Node* n);
+    void getNabors(vector<Point> *nabors,Node* n);
+    void getJumpNodes(vector<Point> *jumps,Node* n);
+    bool validPoint(const Point& p);
 private:
     Point _mapSize;
     Point _startPos;
@@ -130,7 +148,7 @@ int AStar::readMap(const char* str)
     istr>>_endPos.x>>_endPos.y;
 
     _map = new int *[_mapSize.x];
-    for(int i = 0;i< _mapSize.x;i++)
+    for(int i = _mapSize.x-1;i>=0;i--)
     {
         _map[i] = new int[_mapSize.y];
         for(int j = 0;j< _mapSize.y;j++)
@@ -143,7 +161,7 @@ int AStar::readMap(const char* str)
 
 void AStar::printMap()
 {
-    for(int i = 0;i< _mapSize.x;i++)
+    for(int i = _mapSize.x-1;i>=0;i--)
     {
         for(int j = 0;j< _mapSize.y;j++)
         {
@@ -160,6 +178,13 @@ void AStar::initNode(Node &node,const Point& pos,int g,Node* father)
     node.h = estimate(pos);
     node.f = node.g +node.h;
     node.father = father;
+}
+
+bool AStar::validPoint(const Point& p)
+{
+    if(p.x< 0 || p.y<0 || p.x > (_mapSize.x -1) || p.y > (_mapSize.y -1) )
+        return false;
+    return true;
 }
 
 bool AStar::findRoad()
@@ -186,80 +211,160 @@ bool AStar::findRoad()
         //将第一个元素移到最后，并将剩余区间重新排序，组成新的heap
         pop_heap(_openList.begin(),_openList.end(),NodeCompare());
         _openList.pop_back();//删除最后一个元素n
-
-        for(int x = n->pos.x-1;x<= n->pos.x+1; x++) //针对每一个子节点
-        {
-            if(x < 0 || x > _mapSize.x -1)
-                continue;
-            for(int y = n->pos.y-1; y<= n->pos.y+1; y++)
-            {
-
-                if(y < 0 || y > _mapSize.y -1)
-                    continue;
-                Point pos;
-                pos.x = x; pos.y = y;
-
-                if(pos == n->pos)
-                    continue;
-
-                if(_map[x][y] == 1) //不可通过的点
-                    continue;
-
-                int gVal;
-                if(x == n->pos.x || y == n->pos.y)
-                    gVal= n->g +10;
-                else
-                    gVal=n->g +14; //对角线
-
-                vector<Node*>::iterator openResult;
-                for( openResult=_openList.begin();openResult!= _openList.end();++openResult)
-                {
-                    if((*openResult)->pos == pos) //在open列表
-                        break;
-                }
-
-                //在open列表，并且open列表中已经是最优的，跳过
-                if(openResult!= _openList.end() && (*openResult)->g <= gVal)
-                    continue;
-
-                //closed列表
-                vector<Node*>::iterator closeResult;
-                for( closeResult=_closeList.begin();closeResult!= _closeList.end();closeResult++)
-                {
-                    if((*closeResult)->pos == pos) //在close列表
-                        break;
-                }
-
-                //在close列表，并且close列表中已经是最新的了，跳过
-                if(closeResult!= _closeList.end() && (*closeResult)->g <= gVal)
-                    continue;
-
-                //新节点为最优节点
-                //如果在close列表
-                if(closeResult != _closeList.end())
-                {
-                    _closeList.erase(closeResult);
-                    delete *closeResult;
-                }
-
-                //如果在open列表
-                if(openResult!= _openList.end())
-                {
-                    _openList.erase(openResult);
-                    make_heap(_openList.begin(),_openList.end(),NodeCompare());
-                    delete *openResult;
-                }
-
-                Node *child = new Node();
-                initNode(*child,pos,gVal,n);
-                _openList.push_back(child);
-                push_heap(_openList.begin(),_openList.end(),NodeCompare());
-            }
-        }
-
+        expandNode(n);
         _closeList.push_back(n);
     }
     return false;
+}
+
+void AStar::expandNode(Node* n)
+{
+    vector<Point> nodeList;
+    if(kUseJumpNode)
+        getJumpNodes(&nodeList,n);
+    else
+        getNabors(&nodeList,n);
+
+    for(auto& pos:nodeList)
+    {
+        if(_map[pos.x][pos.y] == 1) //不可通过的点
+            continue;
+
+        int gVal;
+        if(pos.x == n->pos.x || pos.y == n->pos.y)
+            gVal= n->g +10;
+        else
+            gVal=n->g +14; //对角线
+
+        vector<Node*>::iterator openResult;
+        for( openResult=_openList.begin();openResult!= _openList.end();++openResult)
+        {
+            if((*openResult)->pos == pos) //在open列表
+                break;
+        }
+
+        //在open列表，并且open列表中已经是最优的，跳过
+        if(openResult!= _openList.end() && (*openResult)->g <= gVal)
+            continue;
+
+        //closed列表
+        vector<Node*>::iterator closeResult;
+        for( closeResult=_closeList.begin();closeResult!= _closeList.end();closeResult++)
+        {
+            if((*closeResult)->pos == pos) //在close列表
+                break;
+        }
+
+        //在close列表，并且close列表中已经是最新的了，跳过
+        if(closeResult!= _closeList.end() && (*closeResult)->g <= gVal)
+            continue;
+
+        //新节点为最优节点
+        //如果在close列表
+        if(closeResult != _closeList.end())
+        {
+            _closeList.erase(closeResult);
+            delete *closeResult;
+        }
+
+        //如果在open列表
+        if(openResult!= _openList.end())
+        {
+            _openList.erase(openResult);
+            make_heap(_openList.begin(),_openList.end(),NodeCompare());
+            delete *openResult;
+        }
+
+        Node *child = new Node();
+        initNode(*child,pos,gVal,n);
+        _openList.push_back(child);
+        push_heap(_openList.begin(),_openList.end(),NodeCompare());
+    }
+}
+
+void AStar::getNabors(vector<Point> *nabors,Node* n)
+{
+     for(int x = n->pos.x-1;x<= n->pos.x+1; x++) //针对每一个子节点
+    {
+        if(x < 0 || x > _mapSize.x -1)
+            continue;
+        for(int y = n->pos.y-1; y<= n->pos.y+1; y++)
+        {
+
+            if(y < 0 || y > _mapSize.y -1)
+                continue;
+            Point pos(x,y);
+
+            if(pos == n->pos)
+                continue;
+            nabors->push_back(pos);
+        }
+    }
+}
+
+void AStar::getJumpNodes(vector<Point> *jumps,Node* n)
+{
+    if(!n->father)
+    {
+        getNabors(jumps,n);
+        return;
+    }
+
+    auto fPos = n->father->pos;
+
+    int x = n->pos.x;
+    int y = n->pos.y;
+
+    int dx = x - fPos.x;
+    int dy = y - fPos.y;
+
+    /*
+     * 这里假设 1 0 从左下角不能到右上角
+     *          0 1
+     */
+    if(dx!= 0 && dy!= 0) //父节点和当前节点在对角线上
+    {
+        //当前节点旁边的两个点，并且远离父节点
+        if(validPoint(Point(x,y+dy)) && _map[x][y+dy]==0)
+            jumps->push_back(Point(x,y+dy));
+        if(validPoint(Point(x+dx,y)) && _map[x+dx][y]==0)
+            jumps->push_back(Point(x+dx,y));
+
+        //对角线的另一个点
+        if(validPoint(Point(x+dx, y+ dy)) && ( _map[x][y+dy]==0 || _map[x+dx][y]==0))
+            jumps->push_back(Point(x+dx,y+dy));
+
+        //靠近父节点的两个角
+        if(validPoint(Point(x-dx,y+dy)) && _map[x - dx][y] ==1 && _map[x][y+dy]==0)
+            jumps->push_back(Point(x - dx, y + dy));
+        if(validPoint(Point(x+dx,y-dy)) && _map[x][y-dy] ==1 && _map[x+dx][y]==0)
+            jumps->push_back(Point(x + dx, y - dy));
+    }
+    else //父节点和当前节点在水平或者垂直线上
+    {
+        if(dx == 0) //水平线上
+        {
+            if(validPoint(Point(x, y + dy)) && _map[x][y + dy]==0)
+            {
+                jumps->push_back(Point(x, y + dy));
+                if(validPoint(Point(x+1, y) ) && _map[x+1][y]==1) 
+                    jumps->push_back(Point(x+dx, y+dy));
+                if(validPoint(Point(x-1, y) ) && _map[x-1][y]==1) 
+                    jumps->push_back(Point(x-1, y+dy));
+            }
+        }
+        else
+        {
+            if(validPoint(Point(x+dx, y))  && _map[x+dx][y]==0)
+            {
+                jumps->push_back(Point(x+dx, y));
+                if(validPoint(Point(x, y+1) ) && _map[x][y+1]==1)
+                    jumps->push_back(Point(x+dx, y+1));
+                if(validPoint(Point(x, y-1) ) && _map[x][y-1]==1)
+                    jumps->push_back(Point(x+dx, y-1));
+            }
+        }
+    }
 }
 
 void AStar::printRoad()
@@ -277,7 +382,7 @@ void AStar::printRoad()
         n = n->father;
     }
 
-    for(int i=0;i<_mapSize.x;i++)
+    for(int i=_mapSize.x-1;i>=0;i--)
     {
         for(int j=0;j<_mapSize.y;j++)
         {
@@ -299,6 +404,8 @@ int main()
 {
     AStar astar;
     astar.readMap(MapStr);
+    astar.printMap();
+    cout<<endl;
     if(astar.findRoad())
         astar.printRoad();
     return 0;
