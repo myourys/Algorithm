@@ -38,7 +38,7 @@ int StrSearch(const char S[],const char T[], int pos=0 )
         return i; // 匹配成功   返回下标
     else
         return -1; // 串S中(第pos个字符起)不存在和串T相同的子串
-} 
+}
 
 /*
  * KM - 获取子串的模式值数组(前后缀串)
@@ -50,7 +50,7 @@ int StrSearch(const char S[],const char T[], int pos=0 )
  */
 void GetNext(const char *T,int next[])
 {
-     register int iLen = 0;    // Length of T
+     int iLen = 0;    // Length of T
      while( '\0' != T[iLen] )
          iLen++;
 
@@ -78,26 +78,26 @@ void GetNext(const char *T,int next[])
 
 int KMPSearch(const char S[],const char T[])
 {
-    int SLen=0,TLen=0;
-    while( '\0' != S[SLen] )
-        SLen++;
+    int TLen=0;
     while( '\0' != T[TLen] )
         TLen++;
 
-    int *next = new int[TLen];
+    int next[TLen];
     GetNext(T,next);
     int NOCM = 0;     // Number of characters matched
 
-    for(int i=0;i<SLen;i++)//必须比较到最后一位
+    int i =0;
+    while(S[i] != '\0') //必须比较到最后一位
     {
         while(NOCM>0 && S[i]!=T[NOCM]) //如果前后串后字符不满足,则可以循环判断前后串的子前后串是否满足
             NOCM = next[NOCM];
 
-        if(S[i]==T[NOCM])
-            if((++NOCM) == TLen)
-                return i-TLen+1;
+        if(S[i++]==T[NOCM]) //当前位置匹配成功，继续往后匹配
+            if((++NOCM) == TLen) //匹配位数+1，如果已经匹配到最后一位，成功鸟
+                return i-TLen;
     }
-    if(NOCM!=TLen) return -1;
+
+    return -1;
 }
 
 
@@ -106,6 +106,6 @@ int main()
     cout<<StrSearch("abccabccabca","cabc")<<endl;
     cout<<KMPSearch("abccabccabca","cabc")<<endl;
     cout<<KMPSearch("abccabccabca","cabccabc")<<endl;
-
+    return 0;
 }
 
