@@ -4,31 +4,35 @@
 #        Email: myourys@gmail.com
 #     HomePage: http://www.yiwuye.com
 #      Version: 1.0.1
-#   LastChange: 2013-03-22 16:43:42
+#   LastChange: 2014-09-11 15:10:27
 #         Desc: 线性表C语言版 基本测试文件
 #      History:
 =============================================================================*/
 #include <stdio.h>
 #include <stdlib.h>
-#include "CList.h"
-int main() 
-{ 
-    Link px;
-    LinkList list=InitList();
-    int i;
-    for(i=0;i<10;i++)
+#include "List.h"
+int main()
+{
+    List list=list_create(NULL);
+    for(int i=0;i<10;i++)
     {
-        ListInsert(list,i,(i+1)*(i+1));
+        list_insert(list,i,(i+1)*(i+1));
     }
-    ListDelete(list,1);
-    ListDelete(list,4);
-    px=list->head;
-    for(i=0;i<list->len;i++)
+
+    list_delete(list,1);
+    list_delete(list,4);
+
+    Item p = list->head;
+    for(int i=0;i<list->len;i++)
     {
-        printf("%d\n",px->data);
-        px=px->next;
+        printf("%d'th element is : %d\n", i , p->data);
+        p = p->next;
     }
-    printf("%d\n",list->len);
-    return 0; 
+
+    printf("list length is:%d\n",list->len);
+
+    list_destroy(list);
+
+    return 0;
 }
 

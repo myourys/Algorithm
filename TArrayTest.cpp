@@ -23,12 +23,18 @@ int main()
                 my.Assign('a'+i+j+k,i,j,k);
 
     for(i=0;i<bound1;i++)
+    {
         for(j=0;j<bound2;j++)
+        {
             for(k=0;k<bound3;k++)
             {
                 my.Value(&temp,i,j,k);
-                cout<<temp<<endl;
+                cout<<temp;
             }
+            cout<<endl;
+        }
+        cout<<endl;
+    }
 
     return 0;
 }
