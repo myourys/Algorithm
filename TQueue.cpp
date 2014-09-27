@@ -8,8 +8,7 @@
 #         Desc: 队列模版类实现测试文件
 #      History:
 =============================================================================*/
-#include<iostream> 
-#include <stdlib.h>
+#include<iostream>
 #include "TQueue.h"
 using namespace std;
 
@@ -19,13 +18,13 @@ int main()
     int temp;
     for(int i=2;i<10;i++)
     {
-        my.EnQueue(i);
-        my.GetHead(temp);
+        my.enQueue(i);
+        my.getHead(temp);
         cout<<temp<<endl;
     }
     for(int i=2;i<10;i++)
     {
-        my.DeQueue(temp);
+        my.deQueue(temp);
         cout<<temp<<endl; 
     }
     return 0;

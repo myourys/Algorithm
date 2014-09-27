@@ -12,62 +12,62 @@
 #define _STACK_H
 #define STACK_INIT_SIZE 100
 #define STACKINCREMENT 10
-template <class DataType>
+template <class T>
 class Stack{
 public:
     Stack();
-    void Push(DataType e);     
-    int Pop(DataType &e);      
-    int GetTop(DataType &e);   
-    int Empty();          
-    void Destroy();       
+    void Push(T e);
+    int Pop(T &e);
+    int GetTop(T &e);
+    int Empty();
+    void Destroy();
 private:
-    DataType *base;
-    DataType *top;
+    T *base;
+    T *top;
     int stacksize;
 };
 
-template <class DataType>
-Stack<DataType>::Stack()
+template <class T>
+Stack<T>::Stack()
 {
-    if(!(base=(DataType*)malloc(STACK_INIT_SIZE*sizeof(DataType)))) exit(1);
+    if(!(base=(T*)malloc(STACK_INIT_SIZE*sizeof(T)))) exit(1);
     top=base;
     stacksize=STACK_INIT_SIZE;
 }
 
-template <class DataType>
-void Stack<DataType>::Push(DataType e)
+template <class T>
+void Stack<T>::Push(T e)
 {
     if(top-base>=stacksize)
     {
-        if(!(base=(DataType*)realloc(base,(stacksize+STACKINCREMENT)*sizeof(DataType)))) exit(1);
+        if(!(base=(T*)realloc(base,(stacksize+STACKINCREMENT)*sizeof(T)))) exit(1);
         top=base+stacksize;
         stacksize+=STACKINCREMENT;
     }
     *top++=e;
 }
 
-template <class DataType>
-int Stack<DataType>::Pop(DataType &e)
+template <class T>
+int Stack<T>::Pop(T &e)
 {
     if(top==base) return 0;
     e=*--top;
     return 1;
 }
-template <class DataType>
-int Stack<DataType>::GetTop(DataType &e)
+template <class T>
+int Stack<T>::GetTop(T &e)
 {
     if(top==base) return 0;
     e=*(top-1);
     return 1;
 }
-template <class DataType>
-int Stack<DataType>::Empty()
+template <class T>
+int Stack<T>::Empty()
 {
     return top==base? 1:0;
 }
-template <class DataType>
-void Stack<DataType>::Destroy()
+template <class T>
+void Stack<T>::Destroy()
 {
     free(base);
 }

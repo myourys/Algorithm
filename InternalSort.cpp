@@ -192,7 +192,7 @@ void RadixSort(int m[],int n)
 
 
 /*
- * 堆排序
+ * 归并排序 begin
  */
 
 /*
@@ -270,7 +270,7 @@ void MergeSort(int a[],int size)
 }
 
 /*
- * 堆排序 [采用数组排序]
+ * 堆排序 [采用数组存储]
  * O(N * logN)
  * 1．父结点的键值总是大于或等于（小于或等于）任何一个子节点的键值。
  * 2．每个结点的左子树和右子树都是一个二叉堆（都是最大堆或最小堆）
@@ -278,7 +278,7 @@ void MergeSort(int a[],int size)
  * 由于每次重新恢复堆的时间复杂度为O(logN)，共N - 1次重新恢复堆操作，再加上前面建立堆时N / 2次向下调整，
  * 每次调整时间复杂度也为O(logN)。二次操作时间相加还是O(N * logN)。故堆排序的时间复杂度为O(N * logN)
  */
-void MiniHeap(int a[],int n); //堆话数组 ->建立最小堆
+void MiniHeap(int a[],int n); //堆数组 ->建立最小堆
 void MinHeapFixdown(int a[],int i,int n); //调整堆元素
 void HeapSort(int a[],int n)
 {
