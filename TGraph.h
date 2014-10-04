@@ -13,6 +13,7 @@
 #define _TGRAPH_H
 
 #include <iostream>
+#include "TStack.h"
 
 template <class T>
 struct TreeNode
@@ -59,6 +60,13 @@ public:
     void kosaraju();
     void olDFS(int v,bool *visited,int *finished); //顺向
     void olDFS(int v,bool *visited);//逆向
+
+    /*
+     * Tarjan算法 - > <http://blog.sina.com.cn/s/blog_9dd49f8101013ygb.html>
+     * 一次遍历求强连通分量,这里用邻接表作为示例
+     */
+    void tarjan();
+    void tarjanSub(int vex,int *dfn,int *low,Stack<int> &s);
 protected:
     void alSubDFS(int vex,bool *visited);
 private:

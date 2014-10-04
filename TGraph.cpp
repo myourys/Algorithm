@@ -14,6 +14,8 @@
 #include "TGraph.h"
 #include "TQueue.h"
 
+#define MIN(x,y) (x) > (y) ? (y):(x);
+
 using namespace std;
 
 template<class T>
@@ -437,11 +439,69 @@ void Graph<T>::kosaraju()
     delete []finished;
 }
 
+template<class T>
+void Graph<T>::tarjan()
+{
+    count = 0;
+    int *dfn = new int[_algraph.vexNum];
+    int *low = new int[_algraph.vexNum];
+    for(int i = 0; i< _algraph.vexNum;i++)
+    {
+        dfn[i] = -1;
+        low[i] = -1;
+    }
+
+    Stack<int> s;
+
+    for(int i = 0; i< _algraph.vexNum;i++)
+    {
+        if(dfn[i] != -1)
+            continue;
+        tarjanSub(i,dfn,low,s);
+    }
+    delete []dfn;
+    delete []low;
+}
+
+template<class T>
+void Graph<T>::tarjanSub(int vex,int *dfn,int *low,Stack<int> &s)
+{
+    dfn[vex] = low[vex] = count++;
+    s.push(vex);
+    ArcNode *p = _algraph.vertexs[vex].firstArc;
+    while(p)
+    {
+        int j = p->adjvex;
+        if(dfn[j] == -1) //not visited
+        {
+            tarjanSub(j,dfn,low,s);
+            low[vex] = MIN(low[vex],low[j]);
+        }
+        else
+        {
+            low[vex] = MIN(low[vex],dfn[j]);
+        }
+        p = p->next;
+    }
+    if(dfn[vex] == low[vex])
+    {
+        cout<<"强连通分量:"<<endl;
+        int t;
+        while(!s.empty())
+        {
+            s.pop(t);
+            cout<<_algraph.vertexs[t].data<<endl;
+        }
+    }
+}
+
 int main()
 {
     Graph<char> gph;
 
-    //gph.createAlGraph();
+    gph.createAlGraph();
+    gph.tarjan();
+    gph.destroyAlGraph();
     //gph.alBFS();
     //gph.alDFS();
 
@@ -451,11 +511,10 @@ int main()
     
     gph.visitTree(tree);
     
-    gph.destroyAlGraph();
     */
 
-    gph.createOlGraph();
-    gph.kosaraju();
-    gph.destroyOlGraph();
+    //gph.createOlGraph();
+    //gph.kosaraju();
+    //gph.destroyOlGraph();
     return 0;
 }

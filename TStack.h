@@ -16,15 +16,15 @@ template <class T>
 class Stack{
 public:
     Stack();
-    void Push(T e);
-    int Pop(T &e);
-    int GetTop(T &e);
-    int Empty();
-    void Destroy();
+    ~Stack();
+    void push(T e);
+    int pop(T &e);
+    int getTop(T &e);
+    int empty();
 private:
     T *base;
     T *top;
-    int stacksize;
+    int stackSize;
 };
 
 template <class T>
@@ -32,42 +32,43 @@ Stack<T>::Stack()
 {
     if(!(base=(T*)malloc(STACK_INIT_SIZE*sizeof(T)))) exit(1);
     top=base;
-    stacksize=STACK_INIT_SIZE;
+    stackSize=STACK_INIT_SIZE;
 }
 
 template <class T>
-void Stack<T>::Push(T e)
+void Stack<T>::push(T e)
 {
-    if(top-base>=stacksize)
+    if(top-base>=stackSize)
     {
-        if(!(base=(T*)realloc(base,(stacksize+STACKINCREMENT)*sizeof(T)))) exit(1);
-        top=base+stacksize;
-        stacksize+=STACKINCREMENT;
+        if(!(base=(T*)realloc(base,(stackSize+STACKINCREMENT)*sizeof(T)))) exit(1);
+        top=base+stackSize;
+        stackSize+=STACKINCREMENT;
     }
     *top++=e;
 }
 
 template <class T>
-int Stack<T>::Pop(T &e)
+int Stack<T>::pop(T &e)
 {
     if(top==base) return 0;
     e=*--top;
     return 1;
 }
 template <class T>
-int Stack<T>::GetTop(T &e)
+int Stack<T>::getTop(T &e)
 {
     if(top==base) return 0;
     e=*(top-1);
     return 1;
 }
 template <class T>
-int Stack<T>::Empty()
+int Stack<T>::empty()
 {
     return top==base? 1:0;
 }
+
 template <class T>
-void Stack<T>::Destroy()
+Stack<T>::~Stack()
 {
     free(base);
 }
