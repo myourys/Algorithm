@@ -67,6 +67,13 @@ public:
      */
     void tarjan();
     void tarjanSub(int vex,int *dfn,int *low,Stack<int> &s);
+
+    /*
+     * Gabow算法 - 求强连通分量 <http://www.cppblog.com/sosi/archive/2010/09/27/127863.aspx>
+     * 是Tarjan算法的变异体，利用第二个堆栈来辅助求出强连通分量的根，而不是Tarjan算法里面的DFN[]和Low[]数组。
+     */
+    void gabow();
+    void gabowSub(int vex,int *dfn,int *belong,Stack<int> &s1,Stack<int> &s2);
 protected:
     void alSubDFS(int vex,bool *visited);
 private:

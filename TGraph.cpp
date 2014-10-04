@@ -487,12 +487,80 @@ void Graph<T>::tarjanSub(int vex,int *dfn,int *low,Stack<int> &s)
     {
         cout<<"强连通分量:"<<endl;
         int t;
-        while(!s.empty())
+        do
         {
             s.pop(t);
             cout<<_algraph.vertexs[t].data<<endl;
-        }
+        }while(!s.empty() && t != vex);
     }
+}
+
+template<class T>
+void Graph<T>::gabow()
+{
+    count = 0;
+    int *dfn = new int[_algraph.vexNum];
+    int *belong = new int[_algraph.vexNum];
+    for(int i = 0; i< _algraph.vexNum;i++)
+    {
+        dfn[i] = -1;
+        belong[i] = -1;
+    }
+
+    Stack<int> s1;
+    Stack<int> s2;
+
+    for(int i = 0; i< _algraph.vexNum;i++)
+    {
+        if(dfn[i] != -1)
+            continue;
+        gabowSub(i,dfn,belong,s1,s2);
+    }
+    delete []dfn;
+    delete []belong;
+}
+
+template<class T>
+void Graph<T>::gabowSub(int vex,int *dfn,int *belong,Stack<int> &s1,Stack<int> &s2)
+{
+    int t;
+    dfn[vex] = count++;
+    s1.push(vex);
+    s2.push(vex);
+    ArcNode *p = _algraph.vertexs[vex].firstArc;
+    while(p)
+    {
+        int j = p->adjvex;
+        if(dfn[j] == -1) //not visited
+        {
+            gabowSub(j,dfn,belong,s1,s2);
+        }
+        else if(belong[j] == -1) //hava visited
+        {
+            s2.getTop(t);
+            while(dfn[t] > dfn[j])
+            {
+                s2.pop(t);
+                s2.getTop(t);
+            }
+        }
+        p = p->next;
+    }
+
+    s2.getTop(t);
+    if(t == vex)
+    {
+        s2.pop(t);
+        cout<<"强连通分量:"<<endl;
+        do
+        {
+            s1.pop(t);
+            belong[t] = 1;
+            cout<<_algraph.vertexs[t].data<<endl;
+        }while(!s1.empty() && t!= vex);
+    }
+
+
 }
 
 int main()
@@ -501,6 +569,7 @@ int main()
 
     gph.createAlGraph();
     gph.tarjan();
+    gph.gabow();
     gph.destroyAlGraph();
     //gph.alBFS();
     //gph.alDFS();
