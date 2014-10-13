@@ -24,10 +24,10 @@ void Graph<T>::createUDN()
     cout<<"输入无向网顶点数和边数:"<<endl;
     cin>> _mgraph.vexNum >> _mgraph.arcNum;
 
-    _mgraph.vertex = new T[_mgraph.vexNum];
+    _mgraph.vertexs = new T[_mgraph.vexNum];
     cout<<"输入顶点信息:"<<endl;
     for(int i =0;i < _mgraph.vexNum;i++)
-        cin>> _mgraph.vertex[i];
+        cin>> _mgraph.vertexs[i];
 
     _mgraph.adjMatrix = new int*[_mgraph.vexNum];
     for(int i = 0;i<_mgraph.vexNum;i++) //默认所有点不连通
@@ -44,19 +44,20 @@ void Graph<T>::createUDN()
     for (int i = 0; i < _mgraph.arcNum; i++) {
         cin>> v1 >> v2 >> t;
         for (int j = 0; j < _mgraph.vexNum; j++) {
-            if( v1 == _mgraph.vertex[i])
-                m = i;
-            if( v2 == _mgraph.vertex[i])
+            if( v1 == _mgraph.vertexs[j])
+                m = j;
+            if( v2 == _mgraph.vertexs[j])
                 n = j;
         }
         _mgraph.adjMatrix[m][n] = t;
+        _mgraph.adjMatrix[n][m] = t;
     }
 }
 
 template<class T>
 void Graph<T>::destroyUDN()
 {
-    delete []_mgraph.vertex;
+    delete []_mgraph.vertexs;
     for (int i = 0; i < _mgraph.vexNum; i++) {
         delete []_mgraph.adjMatrix[i];
     }
@@ -89,9 +90,9 @@ void Graph<T>::createDN()
     for (int i = 0; i < _mgraph.arcNum; i++) {
         cin>> v1 >> v2 >> t;
         for (int j = 0; j < _mgraph.vexNum; j++) {
-            if( v1 == _mgraph.vertex[i])
-                m = i;
-            if( v2 == _mgraph.vertex[i])
+            if( v1 == _mgraph.vertex[j])
+                m = j;
+            if( v2 == _mgraph.vertex[j])
                 n = j;
         }
         _mgraph.adjMatrix[m][n] = t;
@@ -559,20 +560,70 @@ void Graph<T>::gabowSub(int vex,int *dfn,int *belong,Stack<int> &s1,Stack<int> &
             cout<<_algraph.vertexs[t].data<<endl;
         }while(!s1.empty() && t!= vex);
     }
+}
 
+template<class T>
+void Graph<T>::prim()
+{
+    struct closedge
+    {
+        int adjvex;
+        int lowcost;
+    };
+    closedge *edge = new closedge[_mgraph.vexNum];
 
+    int k = 0; // k 当前最小节点 头
+    for(int i = 0;i<_mgraph.vexNum;i++)//初始化
+    {
+        edge[i].adjvex = k;
+        edge[i].lowcost = INT_MAX;
+    }
+
+    cout<<"找到的最小生成树如下："<<endl;
+    for(int i = 0;i<_mgraph.vexNum-1;i++) //n-1条边
+    {
+        edge[k].lowcost = -1; // k 点 到其他点的距离
+        for(int j = 0;j<_mgraph.vexNum;j++) //更新最小值
+        {
+            if(_mgraph.adjMatrix[k][j] < edge[j].lowcost)
+            {
+                edge[j].adjvex = k; //最小值对应的
+                edge[j].lowcost = _mgraph.adjMatrix[k][j];
+            }
+        }
+
+        int min = INT_MAX;
+        for(int j = 0;j<_mgraph.vexNum;j++)
+        if(edge[j].lowcost != -1 && edge[j].lowcost < min)
+        {
+            min = edge[j].lowcost;
+            k =j;
+        }
+
+        cout<<"("<<_mgraph.vertexs[edge[k].adjvex]<<","<<_mgraph.vertexs[k]<<")"<<endl;
+    }
+
+    delete []edge;
 }
 
 int main()
 {
     Graph<char> gph;
 
+    //邻接矩阵-无向网-最小生成树
+    //gph.createUDN();
+    //gph.prim();
+    //gph.destroyUDN();
+
+    //邻接表- 深度/广度 优先搜索
     gph.createAlGraph();
-    gph.tarjan();
-    gph.gabow();
+    gph.alBFS();
+    gph.alDFS();
     gph.destroyAlGraph();
-    //gph.alBFS();
-    //gph.alDFS();
+    //
+    //gph.tarjan();
+    //gph.gabow();
+    //gph.destroyAlGraph();
 
     /*
     TreeNode<char> *tree;

@@ -74,6 +74,11 @@ public:
      */
     void gabow();
     void gabowSub(int vex,int *dfn,int *belong,Stack<int> &s1,Stack<int> &s2);
+
+    /* Prim 最小生成树
+     * 这里用邻接矩阵数据存储方式，利用最小生成树的MST性质*/
+    void prim();
+
 protected:
     void alSubDFS(int vex,bool *visited);
 private:
@@ -85,7 +90,7 @@ private:
     struct MatrixGraph{
         int vexNum;
         int arcNum;
-        T *vertex;  //顶点
+        T *vertexs;  //顶点
         int **adjMatrix; //边
     };
     MatrixGraph _mgraph;
