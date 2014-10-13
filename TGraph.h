@@ -33,14 +33,15 @@ public:
     void createDN(); //有向图
     void destroyDN();
 
-    /*领接表*/
+    /*邻接表*/
     void createAlGraph();
     void destroyAlGraph();
 
-    void alDFS(); //深度优先搜索
-    void alBFS(); //广度优先搜索
+    void alDFS(); //邻接表-深度优先搜索
+    void alBFS(); //邻接表-广度优先搜索
 
-    void DFSForest(TreeNode<T> *&tree); //深度优先生成树
+    /* 邻接表-深度优先生成树 */
+    void DFSForest(TreeNode<T> *&tree);
     void DFSForestSub(int vex,TreeNode<T> *&parent,bool *visited);
     void visitTree(TreeNode<T> *tree);
 
@@ -53,7 +54,7 @@ public:
      * 缩点: 在大量分析中,可以将一个强连通分量作为一个点
      */
     /*
-     * Kosaraju算法 - 强连通分量
+     * 十字链表- Kosaraju算法 - 强连通分量
      * 基于有向图的强连通分量与其逆向图是一样这个事实
      * 这里用十字链表，少了生成逆向图这一步
      */
@@ -62,21 +63,22 @@ public:
     void olDFS(int v,bool *visited);//逆向
 
     /*
-     * Tarjan算法 - > <http://blog.sina.com.cn/s/blog_9dd49f8101013ygb.html>
+     * 邻接表-Tarjan算法 - > <http://blog.sina.com.cn/s/blog_9dd49f8101013ygb.html>
      * 一次遍历求强连通分量,这里用邻接表作为示例
      */
     void tarjan();
     void tarjanSub(int vex,int *dfn,int *low,Stack<int> &s);
 
     /*
-     * Gabow算法 - 求强连通分量 <http://www.cppblog.com/sosi/archive/2010/09/27/127863.aspx>
+     * 邻接表-Gabow算法 - 求强连通分量 <http://www.cppblog.com/sosi/archive/2010/09/27/127863.aspx>
      * 是Tarjan算法的变异体，利用第二个堆栈来辅助求出强连通分量的根，而不是Tarjan算法里面的DFN[]和Low[]数组。
      */
     void gabow();
     void gabowSub(int vex,int *dfn,int *belong,Stack<int> &s1,Stack<int> &s2);
 
-    /* Prim 最小生成树
-     * 这里用邻接矩阵数据存储方式，利用最小生成树的MST性质*/
+    /* 邻接矩阵- Prim 最小生成树
+     * 这里用邻接矩阵数据存储方式，利用最小生成树的MST性质
+     */
     void prim();
 
 protected:

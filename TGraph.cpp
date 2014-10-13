@@ -21,7 +21,7 @@ using namespace std;
 template<class T>
 void Graph<T>::createUDN()
 {
-    cout<<"输入无向网顶点数和边数:"<<endl;
+    cout<<"邻接矩阵-输入无向网顶点数和边数:"<<endl;
     cin>> _mgraph.vexNum >> _mgraph.arcNum;
 
     _mgraph.vertexs = new T[_mgraph.vexNum];
@@ -67,7 +67,7 @@ void Graph<T>::destroyUDN()
 template<class T>
 void Graph<T>::createDN()
 {
-    cout<<"输入有向图顶点数和边数:"<<endl;
+    cout<<"邻接矩阵-输入有向图顶点数和边数:"<<endl;
     cin>> _mgraph.vexNum >> _mgraph.arcNum;
 
     _mgraph.vertex = new T[_mgraph.vexNum];
@@ -113,7 +113,7 @@ template<class T>
 void Graph<T>::createAlGraph()
 {
     int i,j,m,n;
-    cout<<"输入图类型(1 无向图, 0 有向图)"<<endl;
+    cout<<"邻接表-输入图类型(1 无向图, 0 有向图)"<<endl;
     cin>>_algraph.kind;
     cout<<"输入顶点数和边数:"<<endl;
     cin>>_algraph.vexNum >> _algraph.arcNum;
@@ -190,7 +190,7 @@ template<class T>
 void Graph<T>::createOlGraph()
 {
     int i,j,m,n;
-    cout<<"输入顶点数和边数:"<<endl;
+    cout<<"十字链表-输入顶点数和边数:"<<endl;
     cin>>_olgraph.vexNum >> _olgraph.arcNum;
 
     cout<<"输入顶点信息:"<<endl;
@@ -227,7 +227,7 @@ void Graph<T>::destroyOlGraph()
 {
     ArcBox *p,*q;
     for (int i = 0; i < _olgraph.vexNum; i++) {
-        p = _olgraph.vertexs[i].firstIn;
+        p = _olgraph.vertexs[i].firstOut;
         while(p)
         {
             q = p;
@@ -260,6 +260,7 @@ void Graph<T>::alDFS()
     for (int i = 0; i < _algraph.vexNum; i++)
         visited[i] = false;
 
+    cout<<"邻接表-深度优先搜索:"<<endl;
     for (int i = 0; i < _algraph.vexNum; i++)
         if(!visited[i])
             alSubDFS(i,visited);
@@ -273,6 +274,7 @@ void Graph<T>::alBFS()
     for (int i = 0; i < _algraph.vexNum; i++)
         visited[i] = false;
 
+    cout<<"邻接表-广度优先搜索:"<<endl;
     Queue<int> queue;
     int v;
     ArcNode *p;
@@ -426,7 +428,7 @@ void Graph<T>::kosaraju()
     for(int i = 0;i<_olgraph.vexNum;i++)
         visited[i] = false;
 
-    cout<<"kosaraju求得强连通分量为："<<endl;
+    cout<<"kosaraju-强连通分量为:"<<endl;
     for(int i = _olgraph.vexNum; i>=0;i--)
     {
         int v = finished[i];
@@ -616,25 +618,31 @@ int main()
     //gph.destroyUDN();
 
     //邻接表- 深度/广度 优先搜索
-    gph.createAlGraph();
-    gph.alBFS();
-    gph.alDFS();
-    gph.destroyAlGraph();
-    //
-    //gph.tarjan();
-    //gph.gabow();
+    //gph.createAlGraph();
+    //gph.alBFS();
+    //gph.alDFS();
     //gph.destroyAlGraph();
 
-    /*
-    TreeNode<char> *tree;
-    gph.DFSForest(tree);
-    
-    gph.visitTree(tree);
-    
-    */
+    /* 邻接表-深度优先生成树 */
+    //cout<<"邻接表-深度优先生成树[孩子兄弟链表]:"<<endl;
+    //gph.createAlGraph();
+    //TreeNode<char> *tree;
+    //gph.DFSForest(tree;)
+    //gph.visitTree(tree);
+    //gph.destroyAlGraph();
 
+    //十字链表-kosaraju求强连通分量
     //gph.createOlGraph();
     //gph.kosaraju();
     //gph.destroyOlGraph();
+
+    //邻接表-tarjan/gabow 求强连通分量
+    //gph.createAlGraph();
+    //cout<<"邻接表-tarjan 求强连通分量"<<endl;
+    //gph.tarjan();
+    //cout<<"邻接表-gabow 求强连通分量"<<endl;
+    //gph.gabow();
+    //gph.destroyAlGraph();
+
     return 0;
 }
