@@ -76,10 +76,19 @@ public:
     void gabow();
     void gabowSub(int vex,int *dfn,int *belong,Stack<int> &s1,Stack<int> &s2);
 
-    /* 邻接矩阵- Prim 最小生成树
+    /* 
+     * 邻接矩阵- Prim 最小生成树
      * 这里用邻接矩阵数据存储方式，利用最小生成树的MST性质
      */
     void prim();
+
+    /*
+     * 邻接表 - 求关节点
+     * http://see.xidian.edu.cn/cpp/html/999.html
+     */
+    void findCritic();
+    void alDFS_Critic(int root,int vex,int *low,int *visited);
+    void alDFS_Critic(int vex,int *visited);
 
 protected:
     void alSubDFS(int vex,bool *visited);

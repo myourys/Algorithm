@@ -339,6 +339,7 @@ void Graph<T>::DFSForest(TreeNode<T> *&tree)
     delete []visited;
 
 }
+
 template<class T>
 void Graph<T>::DFSForestSub(int vex,TreeNode<T> *&parent,bool *visited)
 {
@@ -608,6 +609,90 @@ void Graph<T>::prim()
     delete []edge;
 }
 
+template<class T>
+void Graph<T>::findCritic()
+{
+    count = 0;
+    int *visited = new int[_algraph.vexNum];
+    int *low = new int[_algraph.vexNum];
+    for (int i = 0; i < _algraph.vexNum; i++)
+        visited[i] = 0;
+
+    cout<<"无向图的关节点如下："<<endl;
+    /*
+     * （1）若生成树的根有两棵或两棵以上的子树，则此根顶点必为关节点。
+     * 因为图中不存在联结不同子树中顶点的边，因此，若删去根顶点，生成树便变成生成森林
+     */
+    for (int i = 0; i < _algraph.vexNum; i++)
+    {
+        if(!visited[i])
+        {
+            visited[i] = true;
+            int childCount = 0;
+            ArcNode *p = _algraph.vertexs[i].firstArc;
+            while(p && !visited[p->adjvex])
+            {
+                childCount++;
+                alDFS_Critic(p->adjvex,visited);
+                p = p->next;
+            }
+            if(childCount >= 2)
+                cout<<_algraph.vertexs[i].data<<" ";
+
+        }
+    }
+
+    for (int i = 0; i < _algraph.vexNum; i++)
+        visited[i] = low[i] = 0;
+
+    /*
+     * （2）若生成树中某个非叶子顶点v，其某棵子树的根和子树中的其它结点均没有指向v 的祖先的回边，则v 为关节点。
+     *  因为，若删去v，则其子树和图的其它部分被分割开来。
+     */
+    for (int i = 0; i < _algraph.vexNum; i++)
+    {
+        if(!visited[i])
+            alDFS_Critic(i,i,low,visited);
+    }
+}
+
+template<class T>
+void Graph<T>::alDFS_Critic(int root,int vex,int *low,int *visited)
+{
+    int min = visited[vex] = ++count;
+    bool flag = false;
+    ArcNode *p = _algraph.vertexs[vex].firstArc;
+    while(p)
+    {
+        if(!visited[p->adjvex])
+        {
+            alDFS_Critic(root,p->adjvex,low,visited);
+            min = MIN(min,low[p->adjvex]);
+            if(low[p->adjvex] >= visited[vex] && vex!=root  && !flag)
+            {
+                flag = true;
+                cout<<_algraph.vertexs[vex].data<<" ";
+            }
+        }
+        else
+            min = MIN(min,visited[p->adjvex]);
+        p = p->next;
+    }
+    low[vex] = min;
+}
+
+template<class T>
+void Graph<T>::alDFS_Critic(int vex,int *visited)
+{
+    visited[vex] = 1;
+    ArcNode *p = _algraph.vertexs[vex].firstArc;
+    while(p && !visited[p->adjvex])
+    {
+        alDFS_Critic(p->adjvex,visited);
+        p = p->next;
+    }
+}
+
 int main()
 {
     Graph<char> gph;
@@ -644,5 +729,9 @@ int main()
     //gph.gabow();
     //gph.destroyAlGraph();
 
+    //邻接表-求关节点
+    gph.createAlGraph();
+    gph.findCritic();
+    gph.destroyAlGraph();
     return 0;
 }
