@@ -10,22 +10,13 @@
 =============================================================================*/
 
 #include <iostream>
-#include <stdlib.h>
 #include <ctime>
 using namespace std;
-
-void swap(int &a,int &b)
-{
-    int t = a;
-    a = b;
-    b = t;
-}
 
 /*
  * 冒泡排序
  * 从第一个数开始,循环和旁边的数比较,如果后边小,则交换,因此轮交换过后最小数到最前面
  * O(n^2) =  (n-1)*n/2
- *
  */
 void BubbingSort(int s[],int n)
 {
@@ -39,26 +30,19 @@ void BubbingSort(int s[],int n)
 /*
  * 简单选择排序
  * O(n^2) =  (n-1)*n/2
- * 对冒泡的一种改进，减少交换次数，如果内循环元素比外循环元素大，则记下位置和大小，内循环完成后得到最大的数
+ * 对冒泡的一种改进，减少交换次数，如果内循环元素比外循环元素小，则记下位置，内循环完成后得到最小的数
  * 每次外循环将最大(小)的数放在前面
  */
 void SimpleSelectSort(int s[],int n)
 {
-    int i,j,t,pos;
+    int i,j,t;
     for(i=0;i<n-1;i++)
     {
-        t=s[i];
-        pos = i;
-        for(j=i+1;j<n;j++)
-        {
-            if(s[j]<t)
-            {
-                pos = j;
-                t = s[j];
-            }
-        }
-        if(i!=pos)
-            swap(s[i],s[pos]);
+        for(t=i,j=i+1; j<n; j++)
+            if(s[j]<s[t])
+                t = j;
+        if(i!=t)
+            swap(s[i],s[t]);
     }
 }
 
@@ -193,10 +177,6 @@ void RadixSort(int m[],int n)
 
 /*
  * 归并排序 begin
- */
-
-/*
- * 归并排序
  * O(N*logN)
  * 将两个有效数列合并成一个,因此可以考虑分成两个1组,2组合并成1组,直至整个数列完成
  */
@@ -263,8 +243,8 @@ void MergeSort(int a[],int size)
 {
 	int *t=a;
     int *temp=new int[size];
-	for(int i=0;i<size;i++)
-		temp[i]=a[i];
+    std::copy(a,a+size,temp);
+
 	SubMergeSort(a,temp,0,size);
     delete []temp;
 }
@@ -283,8 +263,8 @@ void MinHeapFixdown(int a[],int i,int n); //调整堆元素
 void HeapSort(int a[],int n)
 {
 	int* t = new int[n];
-	for(int i=0;i<n;i++)
-		t[i]=a[i];
+    std::copy(a,a+n,t);
+
 	MiniHeap(t,n);//建立堆
 	for(int i=0;i<n;i++)
 	{
@@ -317,7 +297,7 @@ void MinHeapFixdown(int a[],int i,int n) //大数下沉，自下而上
 
 /*
  * 桶排序
- * 类似Hash,采用分治的思想
+ * 类似Hash,采用分治的思想,先将待排序的分组，以空间换时间
  * O(N)-O(N^2)
  */
 
@@ -325,11 +305,7 @@ struct Bucket //桶结构
 {
     int* s;
     int size;
-    Bucket()
-    {
-        s =NULL;
-        size = 0;
-    }
+    Bucket():s(nullptr),size(0){};
 };
 
 void BucketSort(int a[],int n)
@@ -359,21 +335,21 @@ void BucketSort(int a[],int n)
 
 int main()
 {
-	int Flag = 0;
+	int flag = 0;
 
     srand(time(NULL));
-	while(Flag < 10)
+	while(flag < 10)
 	{
-		Flag++;
+		flag++;
 		int n = 1000000;
 		int* s =new int[n];
 		for(int i=0;i<n;i++)
-			s[i] = rand() %1000000; //注rand()产生的数在0到RAND_MAX之间
+			s[i] = rand() % 1000000; //注rand()产生的数在0到RAND_MAX之间
 		clock_t ibegin, iend;
 		ibegin = clock();
 
         bool isSort = true;
-		switch(Flag)
+		switch(flag)
 		{
 		case 19:
 			cout<<"冒泡排序【BubbingSort】："<<endl;
@@ -408,17 +384,21 @@ int main()
         default:
             isSort = false;
 		}
-		iend = clock();
-		if(iend - ibegin>0.1 && isSort)
-			cout<<"时间（毫秒）："<<iend - ibegin<<endl<<endl;
+        if(isSort)
+        {
+		    iend = clock();
+		    if(iend - ibegin>0.1)
+			    cout<<"时间（毫秒）："<<iend - ibegin<<endl;
 
-		//for(int i =0;i<n;i++)
-		//	cout<<s[i]<<"  ";
+			/*for(int i =0;i<n;i++)
+			    cout<<s[i]<<"  ";
+            cout<<endl;*/
+            cout<<endl;
+        }
 
         delete []s;
 	}
 
     return 0;
 }
-
 
