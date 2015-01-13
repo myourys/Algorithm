@@ -20,7 +20,6 @@
 #include <fstream>
 #include <iterator>
 #include <algorithm>
-//#include <stdlib.h>
 using namespace std;
 
 typedef map<char,unsigned int> SymbolCount; //存放词频,用来构建Huffman Tree

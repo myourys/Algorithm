@@ -13,8 +13,7 @@
  */
 
 #include<iostream>
-using namespace std; 
-#include <stdlib.h>
+using namespace std;
 #include "TBiTree.h"
 
 int main()

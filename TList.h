@@ -54,7 +54,7 @@ List<T>::List()
 template <class T>
 void List<T>::Destroy() 
 {
-    this.Clear();
+    this->Clear();
     free(elem);
 }
 

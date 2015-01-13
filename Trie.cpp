@@ -12,19 +12,19 @@
  * 经常用来前缀单词的查找
  * 插入、查找的复杂度均为O(len),len为字符串长度
  */
+
 #include<iostream>
-#include <stdlib.h>
 using namespace std;
 
-const int CharNum = 26; // 代表26个英文字母
+#define kCharNum 26  /* 代表26个英文字母 */
 
 struct TrieNode
 {
     bool isStr; //是否句尾
-    TrieNode *childs[CharNum]; // 共26个子树
+    TrieNode *childs[kCharNum]; // 共26个子树
     TrieNode():isStr(false)//初始化结构体
     {
-        memset(childs,NULL,sizeof(childs)); //所有孩子置为NULL
+        std::memset(childs,0,sizeof(childs)); //所有孩子置为NULL
     }
 };
 
@@ -78,7 +78,7 @@ bool Trie::search(const char * word)
 
 void Trie::destroy(TrieNode *p)
 {
-    for(int i=0;i<CharNum;i++)
+    for(int i=0;i<kCharNum;i++)
     {
         if(p->childs[i])
             destroy(p->childs[i]);

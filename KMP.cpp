@@ -13,7 +13,6 @@
  * 本文参考http://billhoo.blog.51cto.com/2337751/411486
  */
 #include<iostream>
-#include <stdlib.h>
 using namespace std;
 
 /*
