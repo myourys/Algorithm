@@ -1,159 +1,208 @@
 /*=============================================================================
-#     FileName: BSTree.cpp
-#         Desc: 二叉查找树
+#     FileName: BsTree.cpp
+#         Desc: 二叉查找树C++实现
 #       Author: Hector
 #        Email: myourys@gmail.com
 #     HomePage: http://www.yiwuye.com
 #      Version: 0.0.1
-#   LastChange: 2013-04-01 23:51:03
+#   LastChange: 2015-01-09 18:55:06
 #      History:
 =============================================================================*/
 #include<iostream>
 using namespace std;
-#include <stdlib.h>
 
 /*
  * 二叉查找树,左子树总是小于根节点,右子树总是大于根节点
+ * 查找: 沿着树查找节点，比节点小往左，比节点大往右，最后查找的位置即为插入点
+ * 删除: 1.如果无左子树，接右子树（无右子树反之） 2.如果有左右子树，找到左子树最大，或者右子树最小节点当做替代节点
  */
 
-/*
- * 树节点
- */
-template <class T>
-struct BiTree
+template<class T>
+struct BsTreeNode
 {
-    BiTree()
-    {
-        lchild=NULL;
-        rchild=NULL;
-    }
     T key;
-    BiTree *lchild,*rchild;
+    BsTreeNode *lchild = nullptr;
+    BsTreeNode *rchild = nullptr;
 };
 
-/* 搜索
- * node 返回搜索的节点，没找到则返回最后的查找节点
- */
-template <class T>
-bool SearchBST(BiTree<T>* &root, T key, BiTree<T>* &node)
+template<class T>
+class BsTree
 {
-  node=root;
-	if (!root) //根节点为空
-		return false;
+    public:
+    typedef BsTreeNode<T> Node;
 
-	if (key == root->key) //查找成功
-        return true;
+    BsTree():root(nullptr){};
+    ~BsTree(){destroy(root);};
 
-    if (key < root->key && root->lchild) //在左子树中继续查找
-        return SearchBST(root->lchild, key, node);
+    Node* insert(T key);
+    bool erase(T key){return erase(key,root);};
+    Node* find(T key){return find(key,root);};
+    void visitInOrder(void (*func)(Node*)){visitInOrder(root,func);}; //中序遍历
+private:
+    void destroy(Node *&node);
+    Node* find(T key,Node *node);
+    bool erase(T key,Node* &node);
+    Node* findInsertFather(T key,Node *node);
+    void visitInOrder(Node* node,void (*func)(Node*)); //中序遍历
+public:
+    Node *root;
+};
 
-    if (key > root->key && root->rchild)//右子树继续查找
-        return SearchBST(root->rchild, key, node);
-
-	return false;
+template<class T>
+void BsTree<T>::destroy(Node* &node)
+{
+    if(node)
+    {
+        destroy(node->lchild);
+        destroy(node->rchild);
+        delete node;
+        node = nullptr;
+    }
 }
 
-template <class T>
-bool InsertBST(BiTree<T>* &root,T key)
+template<class T>
+BsTreeNode<T>* BsTree<T>::find(T key,Node *node)
 {
-    BiTree<T>* p;
-    if(SearchBST(root,key,p)) //找到了，不满足二叉排序树规则则退出
+    if(node == nullptr || node->key == key)
+        return node;
+
+    if(key < node->key)
+        return find(key,node->lchild);
+    else
+        return find(key,node->rchild);
+}
+
+template<class T>
+BsTreeNode<T>* BsTree<T>::findInsertFather(T key,Node *node)
+{
+    if(node->key == key) //error
+    {
+        return nullptr;
+    }
+    else if(key < node->key)
+    {
+        if(node->lchild == nullptr)
+            return node;
+        else
+            return findInsertFather(key,node->lchild);
+    }
+    else
+    {
+        if(node->rchild == nullptr)
+            return node;
+        else
+            return findInsertFather(key,node->rchild);
+    }
+}
+
+template<class T>
+BsTreeNode<T>* BsTree<T>::insert(T key)
+{
+    Node* father = nullptr;
+    if(root)
+    {
+        father = findInsertFather(key,root);
+    }
+
+    if(root && !father) // key exist
+        return nullptr;
+
+    Node* node = new Node();
+    node->key = key;
+
+    if(!root)
+    {
+        root = node;
+    }
+    else
+    {
+        if(key < father->key)
+            father->lchild = node;
+        else
+            father->rchild = node;
+    }
+
+    return node;
+}
+
+template<class T>
+bool BsTree<T>::erase(T key,Node* &node)
+{
+    if(!node)
         return false;
 
-    BiTree<T>* s = new BiTree<T>;
-    s->key = key;
-    if(!p)
-        root = s;
-    else if (p->key > s->key)
-        p->lchild = s;
+    if(key < node->key)
+        return erase(key,node->lchild);
+    else if(key > node->key)
+        return erase(key,node->rchild);
+
+    // key == node->key
+    Node* preDel = node;
+
+    if(!node->lchild)
+        node = node->rchild;
+    else if(!node->rchild)
+        node = node->lchild;
     else
-        p->rchild = s;
+    {
+        // 找到右子树的最小节点
+        Node* minNode = node->rchild;
+        Node* father = node;
+        while(minNode->lchild)
+        {
+            father = minNode;
+            minNode = minNode->lchild;
+        }
+        father->lchild = minNode->rchild; // 自己用其右子树替代
+
+        minNode->lchild = preDel->lchild;
+        minNode->rchild = preDel->rchild;
+
+        node = minNode;
+    }
+
+    delete preDel;
     return true;
 }
 
-template <class T>
-bool DeleteBST(BiTree<T>* &root,T key)
+template<class T>
+void  BsTree<T>::visitInOrder(Node* node,void (*func)(Node*)) //中序遍历
 {
-	if(!root)
-		return false;
-
-	if(key < root->key)
-		return DeleteBST(root->lchild,key);
-	else if (key >root->key)
-		return DeleteBST(root->rchild,key);
-	else
-	{
-		BiTree<T>* my=root;
-		if(!root->lchild) //左子树为空，只需右接右子树
-			root=root->rchild;
-		else if (!root->rchild)
-			root=root->lchild;
-		else
-		{
-			BiTree<T>* p=root->lchild;
-			BiTree<T>* fa=root;
-			while(p->rchild) //找到左子树最大值 放到删除的节点中当做新的节点
-			{
-				fa=p;
-				p=p->rchild;
-			}
-			fa->rchild = p->lchild;
-			root = p;
-			root->lchild = my->lchild;
-			root->rchild = my->rchild;
-		}
-		delete my;
-	}
-	return true;
-}
-
-template <class T>
-void DestroyBST( BiTree<T>* &root )
-{
-    if ( root != NULL )
+    if(node)
     {
-        DestroyBST( root->lchild );
-        DestroyBST( root->rchild );
-        delete root;
-    }
-}
-
-template <class T>
-void InROrderBST(BiTree<T>* root)
-{
-    if(root)
-    {
-        InROrderBST(root->lchild);
-        cout<<root->key<<"  ";
-        InROrderBST(root->rchild);
+        visitInOrder(node->lchild,func);
+        func(node);
+        visitInOrder(node->rchild,func);
     }
 }
 
 
+template<class T>
+void display(BsTreeNode<T>* node)
+{
+    cout<<node->key<<" ";
+}
 
 int main()
 {
-    BiTree<int>* root=NULL;
-    int i;
+    BsTree<int> tree;
+
 	int t[]={5,9,1,0,4,8,7,3,2,6};
-    for(i=0;i<10;i++)
-        InsertBST(root,t[i]);
+    for(int i = 0;i<10;i++)
+        tree.insert(t[i]);
+    tree.visitInOrder(display);
 
-	cout<<"InROrderBST:"<<endl;
-    InROrderBST(root);
+    cout<<endl;
+    tree.erase(0);
+    tree.visitInOrder(display);
 
-	DeleteBST(root,0);
-	cout<<"\nDelete [0] InROrderBST:"<<endl;
-    InROrderBST(root);
+    cout<<endl;
+    tree.erase(5);
+    tree.visitInOrder(display);
 
-	DeleteBST(root,5);
-	cout<<"\nDelete [5] InROrderBST:"<<endl;
-    InROrderBST(root);
+    cout<<endl;
+    tree.erase(4);
+    tree.visitInOrder(display);
 
-	DeleteBST(root,7);
-	cout<<"\nDelete [7] InROrderBST:"<<endl;
-    InROrderBST(root);
-
-	DestroyBST(root);
     return 0;
 }

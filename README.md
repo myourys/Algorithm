@@ -70,7 +70,8 @@ Algorithm
 `Trie.cpp`,实现并测试前缀串查找
 
 ###3.二叉排序树
-`BSTree.cpp`,二叉排序树算法实现
+`BsTree.c`纯C语言实现        
+`BSTree.cpp`C++模版类实现
 
 ###4.红黑树
 `RBTree.cpp`,红黑树的C++模版类实现
