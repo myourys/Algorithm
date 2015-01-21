@@ -77,8 +77,8 @@ public:
     //for test
     void display()
     {
-        for(auto iter = _list.begin();iter!=_list.end();++iter)
-            cout<<iter->first<<"  ";
+        for(auto &iter:_list)
+            cout<<iter.first<<"  ";
         cout<<endl;
     }
 private:
