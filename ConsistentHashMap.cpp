@@ -209,7 +209,7 @@ int main()
     /* rand test */
     const int reqSize = 100*1000;
     array<string,reqSize> reqs;
-    for(int i=0;i<reqs.size(); i++)
+    for(int i=0;i<reqs.size(); ++i)
     {
         ostringstream ss;
         ss<<i* (rand()%10 + 1);
@@ -231,7 +231,7 @@ int main()
     for(auto req:reqs)
     {
         const string &s = servers[req]->name;
-        for(int i = 0;i<6;i++)
+        for(int i = 0;i<6;++i)
             if(s.compare(sers[i])==0)
             {
                 nums[i] += 1;
@@ -239,7 +239,7 @@ int main()
             }
     }
 
-    for(int i = 0;i<6;i++)
+    for(int i = 0;i<6;++i)
         cout<<nums[i]<<"  ";
     cout<<endl;
 

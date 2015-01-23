@@ -22,7 +22,7 @@ using namespace std;
  * 2. list,双向链表,并负责存放数据
  */
 
-template<class K,class T>
+template<typename K,typename T>
 class LRUCache
 {
 public:
