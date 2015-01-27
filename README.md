@@ -96,4 +96,4 @@ ps：文件开始有一个是否启用跳步算法进行优化A星算法的开�
 [LRU.cpp](LRU.cpp) LRU近期最少使用数据缓存算法，完全用标准STL实现
 
 ###一致性Hash算法
-[ConsistenHashMap.cpp](ConsistenHashMap.cpp) 一般用作在分布式集群中，服务器的动态添加删除，以及请求的分配
+[ConsistentHashMap.cpp](ConsistentHashMap.cpp) 一般用作在分布式集群中，服务器的动态添加删除，以及请求的分配

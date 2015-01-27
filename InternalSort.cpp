@@ -275,7 +275,7 @@ void HeapSort(int a[],int n)
 	delete []t;
 }
 
-void MiniHeap(int a[],int n) //堆话数组 ->建立最小堆
+void MiniHeap(int a[],int n) //堆化数组 ->建立最小堆
 {
 	//i 从最后一个不是叶子节点的位置开始调整堆
 	for(int i= n/2 - 1;i>=0;i--)
